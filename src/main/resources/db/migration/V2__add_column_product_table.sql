@@ -1,0 +1,4 @@
+
+
+ALTER TABLE product
+ADD thumbnail LONGBLOB NOT NULL ;
