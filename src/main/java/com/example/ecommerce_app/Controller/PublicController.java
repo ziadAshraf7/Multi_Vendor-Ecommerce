@@ -22,7 +22,6 @@ public class PublicController {
 
     private final ProductService productService;
 
-
     @GetMapping("/product/{productId}")
     public ResponseEntity<Product_Detailed_Dto> getProduct(@PathVariable long productId){
         return ResponseEntity.ok(productService.getProductById(productId));
