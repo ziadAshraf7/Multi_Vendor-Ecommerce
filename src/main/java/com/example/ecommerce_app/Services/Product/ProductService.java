@@ -7,6 +7,8 @@ import com.example.ecommerce_app.Dto.Product_Table.Product_Update_Dto;
 import com.example.ecommerce_app.Entity.Product;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface ProductService {
 
      void removeProduct(long productId);
@@ -30,4 +32,13 @@ public interface ProductService {
      Page<Product_Overview_Dto> filterProducts(ProductFilterDto productFilterDto);
 
      Product getProductEntityById(long productId);
+
+     Page<Product_Overview_Dto> getProductsPerBrand(long brandId);
+
+     Page<Product_Overview_Dto>  getBestSellerProductsPerBrand(long brandId);
+
+     Page<Product_Overview_Dto>  getMostViewsProductsPerBrand(long brandId);
+
+     Page<Product_Overview_Dto>  getMostViewsProductsPerCategory(long categoryId);
+
 }

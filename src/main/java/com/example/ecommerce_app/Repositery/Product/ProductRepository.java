@@ -28,5 +28,5 @@ public interface ProductRepository extends JpaRepository<Product ,Long > {
     @Query("SELECT p from Product p LEFT JOIN p.subCategory c LEFT JOIN p.vendor_products vp WHERE vp.discount > 0 AND p.subCategory.id = :categoryId")
     Page<Product> getDiscountProducts(@Param("categoryId") long categoryId , Pageable pageable);
 
-
+    Page<Product> findByBrandId(long brandId , Pageable pageable);
 }

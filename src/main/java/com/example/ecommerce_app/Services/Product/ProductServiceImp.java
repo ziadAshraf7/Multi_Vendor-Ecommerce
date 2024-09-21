@@ -130,6 +130,23 @@ public class ProductServiceImp implements ProductService
 
      @Override
      @Transactional(readOnly = true)
+     public Page<Product_Overview_Dto> getBestSellerProductsPerBrand(long brandId) {
+         return null;
+     }
+
+     @Override
+     public Page<Product_Overview_Dto> getMostViewsProductsPerBrand(long brandId) {
+         return null;
+     }
+
+     @Override
+     public Page<Product_Overview_Dto> getMostViewsProductsPerCategory(long categoryId) {
+         return null;
+     }
+
+
+     @Override
+     @Transactional(readOnly = true)
      public Page<Product_Overview_Dto> getBestSellerProductsPerCategory(long categoryId) {
          return null;
      }
@@ -146,6 +163,17 @@ public class ProductServiceImp implements ProductService
      public Product getProductEntityById(long productId) {
          return productRepository.findById(productId)
                  .orElseThrow(() -> new NotFoundException("Unable to find Product with Id " + productId));
+     }
+
+     @Override
+     public Page<Product_Overview_Dto> getProductsPerBrand(long brandId) {
+        try {
+            Page<Product> products = productRepository.findByBrandId(brandId , pageable);
+            return products.map(productMapper::to_Product_Overview_Dto);
+        }catch (RuntimeException e){
+            log.error(e.getMessage());
+            throw new NotFoundException("Unable to retrieve products of brand id " + brandId);
+        }
      }
 
      @Override
