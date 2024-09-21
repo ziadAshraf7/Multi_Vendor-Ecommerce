@@ -29,5 +29,5 @@ public interface ProductService {
 
      Page<Product_Overview_Dto> filterProducts(ProductFilterDto productFilterDto);
 
-
+     Product getProductEntityById(long productId);
 }

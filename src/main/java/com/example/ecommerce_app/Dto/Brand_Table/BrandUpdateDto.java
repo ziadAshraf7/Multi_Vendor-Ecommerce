@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class BrandUpdateDto   {
 
+    @NotNull(message = "id cannot be null")
     private long brandId;
 
     private String name;

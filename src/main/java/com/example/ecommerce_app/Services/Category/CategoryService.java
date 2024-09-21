@@ -16,4 +16,7 @@ public interface CategoryService {
     Category getParentCategoryEntityById(long categoryId);
 
     void updateCategory(CategoryUpdateDto categoryUpdateDto);
+
+    Category getCategoryEntityById(long categoryId);
+
 }

@@ -5,10 +5,10 @@ import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
 import com.example.ecommerce_app.Mapper.ProductMapper;
-import com.example.ecommerce_app.Repositery.Brand.BrandRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product_Image.Vendor_Product_Image_Repository;
 import com.example.ecommerce_app.Repositery.Vendor_Product.Vendor_Product_Repository;
+import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
 import com.example.ecommerce_app.Services.User.UserServiceImp;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
@@ -28,7 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Product_Management_Service_Imp  implements Product_Management_Service{
 
-    private final BrandRepository brandRepository;
+    private final BrandService brandService;
 
     private final CategoryService categoryService;
 
@@ -47,12 +47,11 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
     public void addProduct(Product_Creation_Dto product_creation_dto) {
 
         try {
-            Brand brand = brandRepository.findById(product_creation_dto.getBrandId())
-                    .orElseThrow(() -> new RuntimeException("brand is not found"));
+            Brand brand = brandService.getBrandEntityById(product_creation_dto.getBrandId());
 
             Category subCategory = categoryService.getSubCategoryEntityById(product_creation_dto.getSubCategoryId());
 
-            User vendor = userServiceImp.getUserEntity(product_creation_dto.getVendorId() , UserRoles.VENDOR);
+            User vendor = userServiceImp.getUserEntityById(product_creation_dto.getVendorId() , UserRoles.VENDOR);
 
             Product product = Product.builder()
                     .description(product_creation_dto.getDescription())

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Product_Update_Dto {
 
-    @NotNull
+    @NotNull(message = "id cannot be null")
     private long productId;
 
     private String name;

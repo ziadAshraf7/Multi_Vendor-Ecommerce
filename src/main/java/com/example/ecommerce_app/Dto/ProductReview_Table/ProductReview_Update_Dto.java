@@ -19,17 +19,16 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class ProductReview_Update_Dto {
 
-    @NotNull
+    @NotNull(message = "product id cannot be null")
     private long productId;
 
-    @NotNull
+    @NotNull(message = "user id cannot be null")
     private long userId;
 
     @DecimalMin(value = "0.5")
     @DecimalMax(value = "5.0")
     private Double rate;
 
-    @NotEmpty
     private String description;
 
     private MultipartFile image;

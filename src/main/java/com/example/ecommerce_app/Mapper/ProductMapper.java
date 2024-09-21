@@ -62,7 +62,6 @@ public interface ProductMapper {
     }
 
 
-
     @Named("mapToImage")
     default byte[] mapToImage(MultipartFile image) throws IOException { return image.getBytes();};
 
@@ -86,7 +85,6 @@ public interface ProductMapper {
             images.add(Vendor_Product_Image.builder().image(image.getBytes()).build());
         }
         return images;
-
     }
 
     @Named("mapToVendorProductDto")
@@ -96,7 +94,6 @@ public interface ProductMapper {
         for(Vendor_Product vendor_product : vendor_products){
             vendor_product_overview_dtos.add(VENDOR_PRODUCT_MAPPER.to_Vendor_Product_Overview_Dto(vendor_product));
         }
-
         return vendor_product_overview_dtos;
     }
 

@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class CategoryUpdateDto {
 
+    @NotNull(message = "id cannot be null")
     private long categoryId;
 
     private String name;

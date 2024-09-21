@@ -13,10 +13,10 @@ import java.io.IOException;
 public interface CategoryMapper {
 
    @Mappings({
-           @Mapping(target = "parentCategory" , source = "parentCategoryId" , qualifiedByName = "mapParentCategoryIdToParentCategory") ,
+           @Mapping(target = "parentCategory" , ignore = true) ,
            @Mapping(source = "image", target = "image", qualifiedByName = "mapMultipartFileToBytes")
    })
-   Category toSubCategoryEntity(Sub_Category_Creation_Dto subCategoryCreationDto , @Context CategoryRepository categoryRepository);
+   Category toSubCategoryEntity(Sub_Category_Creation_Dto subCategoryCreationDto );
 
 
    @Mappings({
@@ -25,11 +25,6 @@ public interface CategoryMapper {
    Category toParentCategoryEntity(Parent_Category_Creation_Dto parentCategoryCreationDto);
 
 
-   @Named("mapParentCategoryIdToParentCategory")
-    default Category mapParentCategoryIdToParentCategory( long parentCategoryId , @Context CategoryRepository categoryRepository) {
-       return categoryRepository.findById(parentCategoryId)
-                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + parentCategoryId));
-   }
 
    @Named("mapMultipartFileToBytes")
    default byte[] mapMultipartFileToBytes(MultipartFile image) throws IOException {

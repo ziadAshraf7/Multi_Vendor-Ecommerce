@@ -8,7 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @Data
 public class Sub_Category_Creation_Dto extends Parent_Category_Creation_Dto {
-    @NotEmpty(message = "parentCategoryName cannot be empty")
-    @NotNull(message = "parentCategoryName cannot be null")
+
+    @NotNull(message = "parent_Category Id cannot be null")
     private long parentCategoryId;
+
 }

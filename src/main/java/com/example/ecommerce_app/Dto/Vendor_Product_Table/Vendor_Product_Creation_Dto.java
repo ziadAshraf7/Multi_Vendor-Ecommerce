@@ -11,23 +11,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Vendor_Product_Creation_Dto {
 
-    @NotNull
+    @NotNull(message = "user id cannot be null")
     private long vendorId;
 
-    @NotNull
+    @NotNull(message = "product id cannot be null")
     private long productId;
 
     @Min(value = 0)
-    @NotNull
+    @NotNull(message = "stock cannot be null")
     private int stock;
 
     @DecimalMin(value = "0.1")
-    @NotNull
+    @NotNull(message = "price cannot be null")
     private double price;
 
     @DecimalMax(value = "100.0")
     @DecimalMin(value = "0.0")
-    @NotNull
+    @NotNull(message = "discount cannot be null")
     private double discount;
 
 }
