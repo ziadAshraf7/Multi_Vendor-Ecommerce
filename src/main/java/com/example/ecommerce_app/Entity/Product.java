@@ -74,6 +74,9 @@ public class Product extends BaseEntity {
     private  List<Vendor_Product_Image> images;
 
 
+    @OneToMany(mappedBy = "product" , cascade = CascadeType.ALL)
+    List<CartItem> cartItems;
+
     public void addImage(List<Vendor_Product_Image> vendorProductImageList){
         images.addAll(vendorProductImageList);
     }

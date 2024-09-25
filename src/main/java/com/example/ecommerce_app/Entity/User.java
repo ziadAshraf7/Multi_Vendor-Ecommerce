@@ -54,8 +54,9 @@ public class User extends BaseEntity {
     @JsonIgnore
     private List<Vendor_Product> vendor_products;
 
-
     @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
     private final List<ProductReview> productReviews = new ArrayList<>();
 
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    private Cart cart;
 }
