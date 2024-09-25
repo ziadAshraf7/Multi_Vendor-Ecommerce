@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/vendor")
+@RequestMapping("api/vendor")
 @AllArgsConstructor
 public class VendorController {
 
@@ -48,5 +48,10 @@ public class VendorController {
     public ResponseEntity<String> deleteImages(@RequestParam Long vendorId , @RequestParam Long productId ) throws IOException {
             vendor_product_image_service.removeAllImagesPerVendorProduct(vendorId , productId);
             return new ResponseEntity<>("deleted Successfully" , HttpStatus.OK);
+      }
+
+      @GetMapping("/test")
+    public String get(){
+        return "test";
       }
 }

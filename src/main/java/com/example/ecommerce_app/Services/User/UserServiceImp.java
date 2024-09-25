@@ -1,7 +1,8 @@
 package com.example.ecommerce_app.Services.User;
 
 
-import com.example.ecommerce_app.Dto.User.UserDto;
+import com.example.ecommerce_app.Dto.User.UserCreationDto;
+import com.example.ecommerce_app.Dto.User.UserInfoDetails;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
@@ -10,9 +11,8 @@ import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -24,9 +24,12 @@ public class UserServiceImp implements UserService {
 
   private UserMapper userMapper;
 
-  public void addUser(UserDto userDto){
+  private PasswordEncoder passwordEncoder;
+
+  public void addUser(UserCreationDto userCreationDto){
       try {
-        User user = userMapper.toEntity(userDto);
+        User user = userMapper.toEntity(userCreationDto);
+        user.setPassword(passwordEncoder.encode(userCreationDto.getPassword()));
         userRepository.save(user);
       }catch (RuntimeException e){
             log.error(e.getMessage());
@@ -49,5 +52,25 @@ public class UserServiceImp implements UserService {
                 .orElseThrow(() -> new NotFoundException("user is not found"));
     }
 
+    @Override
+    public UserInfoDetails getUserByEmail(String Email) {
+      try {
+          User user = userRepository.findByEmail(Email);
+          return userMapper.toUserInfoDetails(user);
+      }catch (RuntimeException e){
+          log.error(e.getMessage());
+          throw new CustomRuntimeException("User Email" + Email + "is not Found");
+      }
+    }
+
+    @Override
+    public User getUserEntityByEmail(String email) {
+        try {
+           return userRepository.findByEmail(email);
+
+        }catch (RuntimeException e){
+            log.error(e.getMessage());
+            throw new CustomRuntimeException("User Email" + email + "is not Found");
+        }    }
 
 }

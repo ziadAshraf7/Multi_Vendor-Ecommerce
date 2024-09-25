@@ -45,7 +45,7 @@ public class Vendor_Product_Image_Service_Imp implements Vendor_Product_Image_Se
         long productId = vendor_product_image_dto.getProductId();
 
         Product product = productService.getProductEntityById(productId);
-        User vendor = userServiceImp.getUserEntityById(vendorId , UserRoles.VENDOR);
+        User vendor = userServiceImp.getUserEntityById(vendorId , UserRoles.ROLE_VENDOR);
 
         List<Vendor_Product_Image> images = vendor_product_image_mapper.toEntity(vendor_product_image_dto.getImageFiles(), product, vendor);
 

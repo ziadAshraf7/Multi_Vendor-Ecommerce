@@ -17,7 +17,7 @@ public class SessionServiceImp implements SessionService{
     private RedisTemplate<String, Object> template;
 
     @Override
-    public Object getSession(String sessionId) {
+    public Object getSessionData(String sessionId) {
         try {
             return template.opsForValue().get(sessionId);
         }catch (RuntimeException e){

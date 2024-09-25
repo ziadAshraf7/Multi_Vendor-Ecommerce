@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.util.*;
 
 @EqualsAndHashCode(callSuper = true)

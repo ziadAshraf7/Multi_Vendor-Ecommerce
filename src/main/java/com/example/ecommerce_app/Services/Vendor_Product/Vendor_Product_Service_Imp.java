@@ -42,7 +42,7 @@ public class Vendor_Product_Service_Imp implements Vendor_Product_Service {
 
         Product product = productService.getProductEntityById(vendor_product_creation_dto.getProductId());
 
-        User vendor = userService.getUserEntityById(vendor_product_creation_dto.getVendorId() , UserRoles.VENDOR);
+        User vendor = userService.getUserEntityById(vendor_product_creation_dto.getVendorId() , UserRoles.ROLE_VENDOR);
 
         Vendor_Product vendorProduct = vendor_product_mapper. toEntity(vendor_product_creation_dto );
 

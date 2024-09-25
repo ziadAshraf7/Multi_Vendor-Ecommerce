@@ -51,7 +51,7 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
 
             Category subCategory = categoryService.getSubCategoryEntityById(product_creation_dto.getSubCategoryId());
 
-            User vendor = userServiceImp.getUserEntityById(product_creation_dto.getVendorId() , UserRoles.VENDOR);
+            User vendor = userServiceImp.getUserEntityById(product_creation_dto.getVendorId() , UserRoles.ROLE_VENDOR);
 
             Product product = Product.builder()
                     .description(product_creation_dto.getDescription())

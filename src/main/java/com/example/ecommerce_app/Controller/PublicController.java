@@ -1,16 +1,18 @@
 package com.example.ecommerce_app.Controller;
-
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Creation_Dto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Update_Dto;
+import com.example.ecommerce_app.Dto.Authentication.LoginDto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Detailed_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Overview_Dto;
+import com.example.ecommerce_app.Dto.User.UserCreationDto;
+import com.example.ecommerce_app.Services.Authentication.AuthenticationService;
 import com.example.ecommerce_app.Services.Product.ProductService;
-import com.example.ecommerce_app.Services.ProductReview.ProductReviewService;
+import com.example.ecommerce_app.Services.User.UserService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,30 @@ import org.springframework.web.bind.annotation.*;
 public class PublicController {
 
     private final ProductService productService;
+
+    private final UserService userService;
+
+    private final AuthenticationService authenticationService;
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@ModelAttribute @Valid LoginDto loginDto){
+        String jwtToken = authenticationService.loginWithJwt(loginDto);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwtToken);
+
+        return new ResponseEntity<>("login Successfully", headers, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<String> signupUser(@ModelAttribute
+                                             @Valid UserCreationDto userCreationDto){
+
+        userService.addUser(userCreationDto);
+        return new ResponseEntity<>("Account Created Successfully " , HttpStatus.CREATED);
+    }
+
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<Product_Detailed_Dto> getProduct(@PathVariable long productId){

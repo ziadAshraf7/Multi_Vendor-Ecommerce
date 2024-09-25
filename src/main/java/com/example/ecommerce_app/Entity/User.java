@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.*;
 
@@ -32,6 +34,10 @@ public class User extends BaseEntity {
     @NotEmpty
     private String email;
 
+    @Column(name = "password" , nullable = false)
+    @NotEmpty
+    private String password;
+
     @Column(name = "phone" , nullable = false , unique = true)
     @NotEmpty
     private String phoneNumber;
@@ -51,6 +57,5 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
     private final List<ProductReview> productReviews = new ArrayList<>();
-
 
 }

@@ -2,7 +2,7 @@ package com.example.ecommerce_app.Services.Session;
 
 public interface SessionService {
 
-    Object getSession(String sessionId);
+    Object getSessionData(String sessionId);
 
     void addToSession(String sessionId , Object obj);
 
