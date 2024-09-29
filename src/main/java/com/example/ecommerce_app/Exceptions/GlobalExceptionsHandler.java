@@ -3,6 +3,7 @@ package com.example.ecommerce_app.Exceptions;
 
 import com.example.ecommerce_app.Exceptions.ErrorResponses.ErrorResponse;
 import com.example.ecommerce_app.Exceptions.ErrorResponses.ValidationErrorResponse;
+import com.example.ecommerce_app.Exceptions.Exceptions.BadRequestException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
 import jakarta.validation.ValidationException;
@@ -18,6 +19,15 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionsHandler {
+
+
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+        return new ResponseEntity<>(
+                new ErrorResponse(ex.getMessage() , HttpStatus.NOT_FOUND.value()) , HttpStatus.NOT_FOUND
+        );
+    }
 
 
     @ExceptionHandler(NotFoundException.class)

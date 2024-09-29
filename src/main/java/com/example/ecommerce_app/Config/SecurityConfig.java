@@ -2,6 +2,7 @@ package com.example.ecommerce_app.Config;
 
 
 import com.example.ecommerce_app.Filters.JwtAuthFilter;
+import com.example.ecommerce_app.Session.Filter.SessionCreationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,8 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    private final SessionCreationFilter sessionCreationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         RequestCache nullRequestCache = new NullRequestCache();
@@ -33,9 +36,11 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement((htc) -> htc.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore( jwtAuthFilter , UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(sessionCreationFilter , UsernamePasswordAuthenticationFilter.class)
                         .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/vendor/**").hasRole("VENDOR")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                                         .anyRequest().permitAll()
                         );
                       return http.build();

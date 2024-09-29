@@ -6,6 +6,7 @@ import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Entity.Vendor_Product;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
+import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
 import com.example.ecommerce_app.Mapper.Vendor_Product_Mapper;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
@@ -65,6 +66,16 @@ public class Vendor_Product_Service_Imp implements Vendor_Product_Service {
             vendor_product_repository.delete_vendor_product(vendorId , productId);
         }catch (RuntimeException e){
             throw new CustomRuntimeException("Unable to unlink the vendor from the product");
+        }
+    }
+
+    @Override
+    public Vendor_Product getByVendorIdAndProductId(long vendorId, long productId) {
+        try {
+            return vendor_product_repository.findByVendor_IdAndProduct_Id(productId , vendorId);
+        }catch (RuntimeException e){
+            log.error(e.getMessage());
+            throw new NotFoundException("can't retrieve product_vendor entity");
         }
     }
 }

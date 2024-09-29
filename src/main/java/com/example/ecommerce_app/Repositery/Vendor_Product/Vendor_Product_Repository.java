@@ -18,5 +18,6 @@ public interface Vendor_Product_Repository extends JpaRepository<Vendor_Product,
     @Transactional
     void delete_vendor_product(@Param("vendorId") long vendorId , @Param("productId") long productId);
 
-
+    @Query("SELECT vp FROM Vendor_Product vp WHERE vp.vendor.id = :vendorId And vp.product.id = :productId")
+    Vendor_Product findByVendor_IdAndProduct_Id(long productId , long vendorId);
 }

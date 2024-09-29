@@ -27,7 +27,6 @@ public class AdminController {
 
     private final Vendor_Product_Service vendor_product_service;
 
-
     @PostMapping("/brand")
     public ResponseEntity<BrandCreationDto> addBrand(@ModelAttribute BrandCreationDto brandCreationDto){
         brandService.addBrand(brandCreationDto);

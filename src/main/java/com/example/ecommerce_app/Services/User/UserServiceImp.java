@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -26,11 +27,12 @@ public class UserServiceImp implements UserService {
 
   private PasswordEncoder passwordEncoder;
 
-  public void addUser(UserCreationDto userCreationDto){
+  @Override
+  public User addUser(UserCreationDto userCreationDto){
       try {
         User user = userMapper.toEntity(userCreationDto);
         user.setPassword(passwordEncoder.encode(userCreationDto.getPassword()));
-        userRepository.save(user);
+        return  userRepository.save(user);
       }catch (RuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Unable to add User");

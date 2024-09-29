@@ -1,9 +1,14 @@
 package com.example.ecommerce_app.Controller;
 
 
+import com.example.ecommerce_app.Dto.CartItem.CartItemCreationDto;
+import com.example.ecommerce_app.Dto.CartItem.CartItemDto;
+import com.example.ecommerce_app.Dto.CartItem.RemoveFromCartDto;
 import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Creation_Dto;
 import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
 import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Update_Dto;
+import com.example.ecommerce_app.Services.CartItem.CartItemService;
+import com.example.ecommerce_app.Services.Cart_Management.Cart_Management_Service;
 import com.example.ecommerce_app.Services.ProductReview.ProductReviewService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.query.Param;
@@ -15,11 +20,16 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/customer")
+@RequestMapping("api/customer")
 @AllArgsConstructor
 public class CustomerController {
 
     private final ProductReviewService productReviewService;
+
+    private final CartItemService cartItemService;
+
+    private final Cart_Management_Service cartManagementService;
+
 
     @PostMapping("/review")
     public ResponseEntity<String> addReview(@ModelAttribute ProductReview_Creation_Dto productReview_creation_dto){
@@ -46,5 +56,22 @@ public class CustomerController {
             return new ResponseEntity<>( "Updated Successfully", HttpStatus.CREATED);
     }
 
+    @PostMapping("/cart")
+    public ResponseEntity<String> addToCart(@RequestBody CartItemCreationDto cartItemCreationDto){
+
+        cartManagementService.addToCart(cartItemCreationDto);
+        return new ResponseEntity<>( "Added Successfully", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/cart")
+    public ResponseEntity<List<CartItemDto>> getCartItems(@Param("id") long customerId){
+        return ResponseEntity.ok(cartItemService.getCartItemsByCartId(customerId));
+    }
+
+    @DeleteMapping("/cart")
+    public ResponseEntity<String> removeFromCart(RemoveFromCartDto removeFromCartDto){
+        cartManagementService.removeFromCart(removeFromCartDto);
+        return ResponseEntity.ok("Removed From Cart Successfully");
+    }
 
 }

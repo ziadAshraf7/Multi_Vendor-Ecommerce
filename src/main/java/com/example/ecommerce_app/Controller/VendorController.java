@@ -5,7 +5,7 @@ import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Update_Dto;
 import com.example.ecommerce_app.Dto.Vendor_Product_Table.Vendor_Product_Image_Dto;
 import com.example.ecommerce_app.Services.Product.ProductService;
-import com.example.ecommerce_app.Services.Product_Management_Service;
+import com.example.ecommerce_app.Services.Product_Mangement.Product_Management_Service;
 import com.example.ecommerce_app.Services.Vendor_Product_Image.Vendor_Product_Image_Service;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
