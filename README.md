@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a multi-vendor eCommerce platform built using modern Java technologies, including Spring, Spring Boot, Spring Security, Hibernate, and Redis. The platform leverages a MySQL database with Flyway integration for seamless migrations and version control of the schema.
+This project is a multi-vendor eCommerce platform built using modern **Java** technologies, including **Spring**, **Spring Boot**, **Spring Security**, **Hibernate**, and **Redis**. The platform leverages a **MySQL** database with **Flyway** integration for seamless migrations and version control of the schema.
 
 ## Current Features
 
