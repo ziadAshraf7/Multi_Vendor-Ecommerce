@@ -1,11 +1,13 @@
 # Multi-Vendor eCommerce Platform
 
-This project is a **multi-vendor eCommerce platform** built using **Spring**, **Spring Boot**, **Spring Security**, **Hibernate**, and **Redis**. The project leverages a **MySQL** database with **Flyway** for version control and smooth database migrations. The application supports multiple vendors, product management, and secure user authentication.
+## Overview
 
-## Features Implemented
+This project is a multi-vendor eCommerce platform built using modern Java technologies, including Spring, Spring Boot, Spring Security, Hibernate, and Redis. The platform leverages a MySQL database with Flyway integration for seamless migrations and version control of the schema.
 
-### 1. Database Schema and API Design
-I have designed and built a robust database schema that includes the following tables:
+## Current Features
+
+### Database Schema & API
+The project includes a robust and scalable database schema that supports key eCommerce functionalities. The following tables have been implemented, with their respective services and REST APIs:
 - **Product**
 - **User**
 - **Brand**
@@ -18,35 +20,38 @@ I have designed and built a robust database schema that includes the following t
 - **Sub_Category_Attribute**
 - **Product_Attribute_Value**
 
-Each table has been fully integrated with corresponding services and REST APIs, ensuring complete functionality for product and vendor management.
-
-### 2. Authentication and Security
-- Implemented user authentication using **JWT (JSON Web Tokens)**.
-- Managed anonymous user cart sessions using **Redis**, enabling seamless shopping experiences for non-logged-in users.
-- Implemented functionality to link an anonymous user's cart with their user account upon login.
-- Secured the application by protecting sensitive endpoints, ensuring only authenticated users and vendors have access where appropriate.
+### Authentication & Security
+- **JWT Authentication**: Implemented secure authentication with JSON Web Tokens (JWT) for authorized users.
+- **Anonymous Cart Management**: Handled session management for anonymous users using Redis, enabling seamless cart operations before login.
+- **Cart Linking**: Upon user login, the system automatically links the anonymous user's cart to the logged-in user's cart.
+- **Endpoint Security**: Ensured the application’s security by protecting sensitive API endpoints.
 
 ## Upcoming Features
 
-### 1. Performance Optimization
-- **Enhancing Hibernate queries** to optimize database performance and improve response times.
+- **Hibernate Query Optimization**: Perform database performance tuning to optimize and enhance query execution.
+- **Coupons**: Introduce a coupon system to allow discounts on products.
+- **Order Management**: Add an `Order` table to manage customer purchases and transactions.
+- **Payment Gateway Integration**: Integrate PayPal for secure and reliable payment processing.
+- **Product Approval Notifications**: Build a notification system to facilitate communication between vendors and admins regarding product approvals.
+- **Testing & QA**: Implement comprehensive unit and integration tests to ensure functionality.
+- **CI/CD Pipelines**: Set up continuous integration and delivery pipelines for streamlined deployment.
+- **Database Replication**: Implement database replication for improved scalability and fault tolerance.
 
-### 2. Coupons and Orders
-- Adding support for **coupons**, allowing vendors to offer discounts on products.
-- Designing and integrating an **Order** table, with plans to integrate **PayPal** as a payment gateway for secure transactions.
+## Technology Stack
 
-### 3. Vendor-Admin Notification System
-- Implementing a **notification system** to handle product approval workflows, allowing vendors to submit products for admin review and approval.
+- **Backend**: Spring, Spring Boot, Spring Security
+- **Persistence**: Hibernate, MySQL
+- **Session Management**: Redis
+- **Migration**: Flyway
+- **Authentication**: JWT (JSON Web Tokens)
+- **Payment Gateway**: PayPal (upcoming)
+- **Build Tools**: Maven
 
-## Technologies Used
+## Future Enhancements
 
-- **Spring Boot**: Core framework for building the application.
-- **Spring Security**: Handles authentication and security across the platform.
-- **Hibernate**: ORM used for database interactions.
-- **Redis**: Used for session management, particularly for anonymous users.
-- **MySQL**: Relational database used to store all eCommerce data.
-- **Flyway**: Manages database versioning and migrations.
-- **JWT**: Used for secure authentication.
-- **PayPal**: Planned integration for payment processing.
+- **Performance Tuning**: Continued focus on improving the system's overall performance, including query optimizations and load handling.
+- **Additional Features**: Expansion of the platform's functionality with features such as advanced search, recommendation systems, and more.
+
+
 
 
