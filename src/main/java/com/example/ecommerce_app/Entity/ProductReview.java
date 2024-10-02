@@ -36,12 +36,12 @@ public class ProductReview  {
     @Column(name = "image" , columnDefinition = "LONGBLOB")
     private byte[] image;
 
-    @ManyToOne(cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY , cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "customer_id")
     @MapsId("customerId")
     private User user;
 
-    @ManyToOne(cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST})
     @JoinColumn(name = "product_id")
     @MapsId("productId")
     private Product product;

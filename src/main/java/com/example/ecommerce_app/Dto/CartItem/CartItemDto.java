@@ -21,7 +21,7 @@ public class CartItemDto {
 
     private int rating;
 
-//    private byte[] thumbNail;
+    private byte[] thumbNail;
 
     private int quantity;
 

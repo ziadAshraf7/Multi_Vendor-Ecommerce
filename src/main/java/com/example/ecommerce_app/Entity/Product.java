@@ -49,32 +49,32 @@ public class Product extends BaseEntity {
     @Column(name = "thumbnail" , columnDefinition = "LONGBLOB" , nullable = false)
     private byte[] thumbNail;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST , CascadeType.REMOVE} , fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
-    @ManyToOne(cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST})
     @JoinColumn(name = "category_id")
     private Category subCategory;
 
     @Column(name = "description" , columnDefinition = "TEXT" , nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "product" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
     private List<Vendor_Product> vendor_products;
 
 
-    @OneToMany(mappedBy = "product" , cascade = CascadeType.ALL )
+    @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE} )
     private List<ProductReview> reviews;
 
 
-    @OneToMany(mappedBy = "product" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
     private  List<Vendor_Product_Image> images;
 
 
-    @OneToMany(mappedBy = "product" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     List<CartItem> cartItems;
 
     public void addImage(List<Vendor_Product_Image> vendorProductImageList){

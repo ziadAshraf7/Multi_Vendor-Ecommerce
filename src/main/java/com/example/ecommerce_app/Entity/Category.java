@@ -37,7 +37,7 @@ public class Category extends BaseEntity {
     private String description;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST})
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
@@ -50,7 +50,7 @@ public class Category extends BaseEntity {
     @JsonIgnore
     private final List<Product> products = new ArrayList<>();
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JoinTable(
             name = "sub_category_attributes",
             joinColumns = { @JoinColumn(name = "sub_category_id") },

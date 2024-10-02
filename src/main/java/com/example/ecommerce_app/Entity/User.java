@@ -50,13 +50,13 @@ public class User extends BaseEntity {
     @NotEmpty
     private String address;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "vendor" , cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "vendor" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
     private List<Vendor_Product> vendor_products;
 
-    @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user" ,cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private final List<ProductReview> productReviews = new ArrayList<>();
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "customer", cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private Cart cart;
 }

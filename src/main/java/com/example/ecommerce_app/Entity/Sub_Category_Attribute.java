@@ -24,7 +24,7 @@ public class Sub_Category_Attribute {
     @NotEmpty
     private String name;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JoinTable(
             name = "sub_category_attributes",
             joinColumns = { @JoinColumn(name = "sub_category_attribute_id") },
@@ -32,7 +32,7 @@ public class Sub_Category_Attribute {
     )
     private final Set<Category> subCategories;
 
-    @OneToMany(mappedBy = "subCategoryAttribute" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "subCategoryAttribute" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private final List<Product_Attribute_Value> values;
 
 

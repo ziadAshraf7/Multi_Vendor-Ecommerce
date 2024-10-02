@@ -87,8 +87,11 @@ public class BrandServiceImp implements BrandService {
     @Override
     @Transactional(readOnly = true)
     public Brand getBrandEntityById(long brandId) {
-         return brandRepository.findById(brandId)
-                .orElseThrow(() -> new NotFoundException("brand with id " + brandId + " is not found"));
+        try {
+            return brandRepository.getReferenceById(brandId);
+        }catch (RuntimeException e){
+            throw new NotFoundException("Unable to Find the Brand id " + brandId);
+        }
     }
 
 }

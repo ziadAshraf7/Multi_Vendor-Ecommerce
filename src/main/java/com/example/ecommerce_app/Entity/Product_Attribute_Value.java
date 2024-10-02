@@ -22,7 +22,7 @@ public class Product_Attribute_Value {
      private String value;
 
 
-     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST})
+     @ManyToOne(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST})
      @JoinColumn(name = "sub_category_attribute_id")
      private Sub_Category_Attribute subCategoryAttribute;
 

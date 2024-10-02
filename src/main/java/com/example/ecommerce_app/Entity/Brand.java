@@ -37,7 +37,7 @@ public class Brand  {
     @Column(name = "image" , nullable = false)
     private byte[] image;
 
-    @OneToMany(mappedBy = "brand" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "brand" ,cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
     List<Product> products;
 

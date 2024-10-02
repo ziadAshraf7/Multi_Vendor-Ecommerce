@@ -23,10 +23,10 @@ public class Cart   {
     @Column(name = "total_price" , nullable = false)
     private double totalPrice;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private List<CartItem> items;
 
-    @OneToOne(cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @OneToOne(cascade = { CascadeType.PERSIST})
     @MapsId
     @JoinColumn(name = "customer_id")
     private User customer;

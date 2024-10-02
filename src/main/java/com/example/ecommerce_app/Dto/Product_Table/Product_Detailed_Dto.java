@@ -42,6 +42,12 @@ public class Product_Detailed_Dto {
 
     private String description;
 
+//    private double price;
+//
+//    private double discount;
+//
+//    private int stock;
+
     private List<Vendor_Product_Overview_Dto> vendor_products_dtos;
 
     private List<ProductReview_Detailed_Dto> reviewsDtos;

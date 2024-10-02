@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .addFilterBefore( jwtAuthFilter , UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(sessionCreationFilter , UsernamePasswordAuthenticationFilter.class)
                         .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/vendor/**").hasRole("VENDOR")
+//                        .requestMatchers("/api/vendor/**").hasRole("VENDOR")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                                         .anyRequest().permitAll()

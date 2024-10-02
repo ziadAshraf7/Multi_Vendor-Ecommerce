@@ -24,12 +24,12 @@ public class Vendor_Product {
     @EmbeddedId
     private Vendor_Product_EmbeddedId id ;
 
-    @ManyToOne(  cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @ManyToOne( fetch = FetchType.LAZY)
     @MapsId("productId")
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne( cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @ManyToOne( fetch = FetchType.LAZY)
     @MapsId("vendorId")
     @JoinColumn(name = "vendor_id")
     private User vendor;

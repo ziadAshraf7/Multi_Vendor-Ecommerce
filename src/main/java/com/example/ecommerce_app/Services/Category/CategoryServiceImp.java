@@ -94,8 +94,11 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public Category getCategoryEntityById(long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Unable to find Category with id " + categoryId));
+        try {
+            return categoryRepository.getReferenceById(categoryId);
+        }catch (RuntimeException e){
+            throw new NotFoundException("Unable to find Category id " + categoryId);
+        }
     }
 
 

@@ -40,12 +40,13 @@ public class UserServiceImp implements UserService {
   }
 
   public User getUserEntityById(long userId , UserRoles userRole){
-    User  user = userRepository.findById(userId)
-             .orElseThrow(() -> new NotFoundException("user is not found"));
+     try {
+        return userRepository.getReferenceById(userId);
+     }catch (RuntimeException e){
+         log.error(e.getMessage());
+         throw new NotFoundException("user is not found");
+     }
 
-     if(user.getUserRole() != userRole) throw new RuntimeException("user is not a " + userRole );
-
-     return user;
   }
 
     @Override

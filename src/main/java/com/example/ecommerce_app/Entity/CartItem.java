@@ -35,12 +35,12 @@ public class CartItem {
     @Column(name = "discount" , nullable = false)
     private double discount;
 
-    @ManyToOne( cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @MapsId("productId")
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne(cascade = {CascadeType.DETACH , CascadeType.MERGE , CascadeType.REFRESH , CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY , cascade = {CascadeType.PERSIST})
     @MapsId("cartId")
     @JoinColumn(name = "cart_id")
     private Cart cart;
