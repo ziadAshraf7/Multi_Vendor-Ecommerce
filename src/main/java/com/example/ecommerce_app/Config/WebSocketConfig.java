@@ -3,6 +3,7 @@ package com.example.ecommerce_app.Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.messaging.converter.DefaultContentTypeResolver;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
@@ -21,6 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @Configuration
 @AllArgsConstructor
 @EnableWebSocketMessageBroker
+@EnableKafka
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
