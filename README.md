@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a multi-vendor eCommerce platform built using modern **Java** technologies, including **Spring**, **Spring Boot**, **Spring Security**, **Hibernate**, and **Redis**. The platform leverages a **MySQL** database with **Flyway** integration for seamless migrations and version control of the schema.
+This project is a multi-vendor eCommerce platform built using modern **Java** technologies, including **Spring**, **Spring Boot**, **Spring Security**, **Hibernate**, **Redis** , **WebSocket** and **Apache Kafka** . The platform leverages a **MySQL** database with **Flyway** integration for seamless migrations and version control of the schema.
 
 ## Current Features
 
@@ -26,13 +26,22 @@ The project includes a robust and scalable database schema that supports key eCo
 - **Cart Linking**: Upon user login, the system automatically links the anonymous user's cart to the logged-in user's cart.
 - **Endpoint Security**: Ensured the application’s security by protecting sensitive API endpoints.
 
+## Additional Features
+
+### WebSocket Integration
+- **Real-time Communication**: Implemented WebSocket connections for real-time communication between vendors and the admin. This allows instant notifications and updates on product creation requests.
+
+### Notification System with Apache Kafka
+- **Message Broker**: Integrated Apache Kafka as a message broker to manage the notification system efficiently. 
+- **Vendor-Admin Notifications**: Notifications are sent between vendors and the admin regarding product creation requests, including approval or rejection responses.
+- **Manual Acknowledgment**: Configured manual acknowledgment in the Kafka consumer settings to ensure that notification messages can be sent to users who are offline. 
+- **Reconnection Handling**: Offline users receive their pending notifications when they reconnect through the WebSocket.
+
 ## Upcoming Features
 
-- **Hibernate Query Optimization**: Perform database performance tuning to optimize and enhance query execution.
 - **Coupons**: Introduce a coupon system to allow discounts on products.
 - **Order Management**: Add an `Order` table to manage customer purchases and transactions.
 - **Payment Gateway Integration**: Integrate PayPal for secure and reliable payment processing.
-- **Product Approval Notifications**: Build a notification system to facilitate communication between vendors and admins regarding product approvals.
 - **Testing & QA**: Implement comprehensive unit and integration tests to ensure functionality.
 - **CI/CD Pipelines**: Set up continuous integration and delivery pipelines for streamlined deployment.
 - **Database Replication**: Implement database replication for improved scalability and fault tolerance.
@@ -44,6 +53,8 @@ The project includes a robust and scalable database schema that supports key eCo
 - **Session Management**: Redis
 - **Migration**: Flyway
 - **Authentication**: JWT (JSON Web Tokens)
+- **Message Broker**: Apache Kafka
+- **WebSocket**: Real-time communication
 - **Payment Gateway**: PayPal (upcoming)
 - **Build Tools**: Maven
 
