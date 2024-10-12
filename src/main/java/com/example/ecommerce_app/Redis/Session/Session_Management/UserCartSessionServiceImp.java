@@ -1,7 +1,7 @@
-package com.example.ecommerce_app.Session.Session_Management;
+package com.example.ecommerce_app.Redis.Session.Session_Management;
 
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Session.AnonymousUser.AnonymousUserCartData;
+import com.example.ecommerce_app.Redis.Session.AnonymousUser.AnonymousUserCartData;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;

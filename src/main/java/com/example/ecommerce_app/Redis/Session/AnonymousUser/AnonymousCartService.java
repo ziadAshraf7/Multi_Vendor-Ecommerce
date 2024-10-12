@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Session.AnonymousUser;
+package com.example.ecommerce_app.Redis.Session.AnonymousUser;
 
 import com.example.ecommerce_app.Dto.CartItem.*;
 import com.example.ecommerce_app.Dto.CartItem.Session.SessionUserCartItemQuantityDto;

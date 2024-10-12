@@ -6,12 +6,15 @@ import com.example.ecommerce_app.Dto.Product_Table.Product_Detailed_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Overview_Dto;
 import com.example.ecommerce_app.Dto.User.UserCreationDto;
 import com.example.ecommerce_app.Entity.User;
+import com.example.ecommerce_app.Notification.DataModel.NotificationData;
+import com.example.ecommerce_app.Notification.Services.NotificationService;
 import com.example.ecommerce_app.Services.Authentication.AuthenticationService;
 import com.example.ecommerce_app.Services.Cart.CartService;
 import com.example.ecommerce_app.Services.Cart_Management.Cart_Management_Service;
 import com.example.ecommerce_app.Services.Product.ProductService;
 import com.example.ecommerce_app.Services.User.UserService;
-import com.example.ecommerce_app.Session.AnonymousUser.AnonymousCartService;
+import com.example.ecommerce_app.Redis.Session.AnonymousUser.AnonymousCartService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -47,6 +50,7 @@ public class PublicController {
 
     private final Cart_Management_Service cartManagementService;
 
+    private final NotificationService notificationService;
 
     @PostMapping("/login")
     @Transactional
@@ -54,7 +58,7 @@ public class PublicController {
 
         SuccessfulLoginInfo successfulLoginInfo = authenticationService.loginWithJwt(loginDto);
 
-        cartManagementService.link_between_sessionCart_userCart(httpSession.getId() , successfulLoginInfo.getUserId());
+//        cartManagementService.link_between_sessionCart_userCart(httpSession.getId() , successfulLoginInfo.getUserId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION_HEADER , "Bearer " + successfulLoginInfo.getJwtToken());
@@ -128,4 +132,21 @@ public class PublicController {
     public List<CartItemDto> getCartItems(HttpSession httpSession){
       return  anonymousCartService.getCartItemsBySessionId(httpSession.getId());
     }
+
+    @PostMapping("/notify")
+    public String sendNotification(){
+        try{
+            NotificationData notificationData =  NotificationData
+                    .builder().recipientId("ziad@gmail.com").message("Hello World").build();
+
+            notificationService.sendNotification(notificationData);
+            return "sent";
+        }catch (RuntimeException e){
+            System.out.println(e.getCause());
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

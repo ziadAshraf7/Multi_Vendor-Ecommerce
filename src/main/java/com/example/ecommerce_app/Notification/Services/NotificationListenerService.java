@@ -1,7 +1,8 @@
-package com.example.ecommerce_app.Notification;
+package com.example.ecommerce_app.Notification.Services;
 
 
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
+import com.example.ecommerce_app.Notification.DataModel.NotificationData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import static com.example.ecommerce_app.Config.KafkaConfig.NOTIFICATIONS_TOPIC;
@@ -50,9 +49,6 @@ public class NotificationListenerService {
             log.error(e.getMessage());
             throw new CustomRuntimeException(e.getMessage());
         }
-
-
-
     }
 
 

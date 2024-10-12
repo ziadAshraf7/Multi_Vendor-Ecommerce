@@ -1,5 +1,6 @@
-package com.example.ecommerce_app.Notification;
+package com.example.ecommerce_app.Notification.Services;
 
+import com.example.ecommerce_app.Notification.DataModel.NotificationData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.Data;

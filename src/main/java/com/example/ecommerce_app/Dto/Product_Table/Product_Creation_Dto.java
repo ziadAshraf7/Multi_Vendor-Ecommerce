@@ -1,16 +1,18 @@
 package com.example.ecommerce_app.Dto.Product_Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Serializable;
 import java.util.List;
 
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class Product_Creation_Dto {
+public class Product_Creation_Dto implements Serializable {
 
     @NotNull(message = "id can't be null")
     private long vendorId;
@@ -32,12 +34,14 @@ public class Product_Creation_Dto {
     @NotNull(message = "category can't be empty")
     private long subCategoryId;
 
+    @JsonIgnore
     @NotNull(message = "thumbNail cannot be null")
     private MultipartFile thumbNail;
 
     @NotNull(message = "description cannot be null")
     private String description;
 
+    @JsonIgnore
     @NotNull(message = "imageFiles cannot be null")
     List<MultipartFile> imageFiles;
 

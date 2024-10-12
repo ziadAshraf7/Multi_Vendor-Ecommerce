@@ -1,7 +1,7 @@
-package com.example.ecommerce_app.Session.Filter;
+package com.example.ecommerce_app.Redis.Session.Filter;
 
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Session.Session_Management.SessionService;
+import com.example.ecommerce_app.Redis.Session.Session_Management.SessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
