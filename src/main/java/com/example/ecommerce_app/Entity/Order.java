@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @Data
+@Builder
 @Table(name = "order" ,
         indexes = {
         @Index(name = "idx_customer_created_status",
@@ -19,7 +20,6 @@ import java.util.List;
 })
 public class Order extends BaseEntity {
 
-
     public Order(){super();}
 
     @OneToOne(fetch = FetchType.LAZY , cascade = CascadeType.PERSIST)
@@ -27,8 +27,8 @@ public class Order extends BaseEntity {
     private User customer;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private OrderStatus status;
+    @Column(name = "status" , columnDefinition = "ENUM('PENDING', 'DELIVERED', 'CANCELLED', 'SHIPPED') DEFAULT 'PENDING'")
+    private OrderStatus status ;
 
     @Column(name = "total_amount", nullable = false)
     private double totalAmount;

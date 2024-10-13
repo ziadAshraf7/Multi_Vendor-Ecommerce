@@ -51,8 +51,9 @@ public class UserServiceImp implements UserService {
 
     @Override
     public User getUserEntityById(long userId) {
-      return   userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("user is not found"));
+      User user = userRepository.getReferenceById(userId);
+      if(user == null) throw new NotFoundException("user is not found for user id" + userId);
+      return user;
     }
 
     @Override

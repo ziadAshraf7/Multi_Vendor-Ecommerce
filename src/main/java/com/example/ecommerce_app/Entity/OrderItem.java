@@ -4,6 +4,7 @@ package com.example.ecommerce_app.Entity;
 import com.example.ecommerce_app.Entity.Embedded_Ids.OrderItemEmbeddedId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
                 columnList = "customer_id, order_id",
                 unique = true)
 })
+@Builder
 public class OrderItem {
 
     @EmbeddedId

@@ -59,4 +59,8 @@ public class User extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "customer", cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private Cart cart;
+
+    @OneToMany(mappedBy = "customer", cascade = {CascadeType.REMOVE , CascadeType.PERSIST})
+    private List<Order> order;
+
 }
