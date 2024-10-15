@@ -11,5 +11,5 @@ public interface CartService {
 
         Cart getCartByCustomerId(long customerId);
 
-        void persistCartEntity(Cart cart);
+        Cart persistCartEntity(Cart cart);
 }

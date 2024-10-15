@@ -1,15 +1,15 @@
 package com.example.ecommerce_app.Services.Cart;
 
-import com.example.ecommerce_app.Dto.CartItem.CartItemCreationDto;
 import com.example.ecommerce_app.Entity.Cart;
 import com.example.ecommerce_app.Entity.User;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Repositery.Cart.CartRepository;
 import com.example.ecommerce_app.Services.User.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +24,13 @@ public class CartServiceImp implements CartService{
 
     private final UserService userService;
 
+    @Transactional
     @Override
     public void createUserCart(User customer ) {
 
         try {
+
+            if(customer == null ) throw new CustomBadRequestException("Customer Entity cannot be null");
 
             Cart cart =  Cart.builder()
                     .totalPrice(0.0)
@@ -36,9 +39,9 @@ public class CartServiceImp implements CartService{
 
             cartRepository.save(cart);
 
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to create cart for user id " + customer.getId());
+            throw new DatabasePersistenceException("Unable to create cart for user id " + customer.getId());
         }
 
 
@@ -46,21 +49,21 @@ public class CartServiceImp implements CartService{
 
     @Override
     public Cart getCartByCustomerId(long customerId) {
-        try {
-            return cartRepository.findByCustomerId(customerId);
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new NotFoundException("Unable to find cart for user id " + customerId  );
-        }
+          Cart cart = cartRepository.findByCustomerId(customerId);
+
+          if(cart == null) throw new CustomNotFoundException("customer user is not found for user id " + customerId);
+
+          return cart;
     }
 
+    @Transactional
     @Override
-    public void persistCartEntity(Cart cart) {
+    public Cart persistCartEntity(Cart cart) {
         try {
-            cartRepository.save(cart);
-        }catch (RuntimeException e){
+         return   cartRepository.save(cart);
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to Update Cart Entity");
+            throw new DatabasePersistenceException("Unable to Update Cart Entity");
         }
     }
 }
