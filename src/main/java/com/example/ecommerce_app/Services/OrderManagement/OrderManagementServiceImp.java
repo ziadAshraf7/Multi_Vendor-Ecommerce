@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Services.OrderItem;
+package com.example.ecommerce_app.Services.OrderManagement;
 
 import com.example.ecommerce_app.Dto.OrderItem.OrderItemCreationDto;
 import com.example.ecommerce_app.Dto.OrderItem.OrderItemRemovalDto;
