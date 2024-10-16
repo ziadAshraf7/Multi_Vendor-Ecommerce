@@ -5,6 +5,8 @@ import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
+import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
+import com.example.ecommerce_app.Exceptions.Exceptions.ImageNumberExceededException;
 import com.example.ecommerce_app.Mapper.ProductMapper;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
@@ -17,6 +19,7 @@ import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 import com.example.ecommerce_app.Utills.UtilsClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,9 +33,9 @@ import java.util.List;
 @Service
 @Data
 @AllArgsConstructor
-public class Product_Management_Service_Imp  implements Product_Management_Service{
+@Slf4j
+public class ProductManagementServiceImp implements Product_Management_Service{
 
-    private static final Logger log = LoggerFactory.getLogger(Product_Management_Service_Imp.class);
     private final BrandService brandService;
 
     private final CategoryRepository categoryRepository;
@@ -47,6 +50,7 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
 
     private final Vendor_Product_Image_Repository vendor_product_image_repository;
 
+    private final CategoryService categoryService;
 
     @Override
     @Transactional
@@ -55,7 +59,7 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
         try {
             Brand brandReference = brandService.getBrandEntityById(product_creation_dto.getBrandId());
 
-            Category subCategoryReference = categoryRepository.getReferenceById(product_creation_dto.getSubCategoryId());
+            Category subCategoryReference = categoryService.getSubCategoryEntityById(product_creation_dto.getSubCategoryId());
 
             User vendorReference = userServiceImp.getUserEntityById(product_creation_dto.getVendorId() , UserRoles.ROLE_VENDOR);
 
@@ -67,8 +71,9 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
 
             saveProductImages(product_creation_dto , productReference);
 
-        }catch (RuntimeException | IOException e){
+        }catch (CustomRuntimeException | IOException e){
             log.error(e.getMessage());
+            throw new CustomRuntimeException("Unable to add new Product");
         }
 
     }
@@ -79,7 +84,6 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
                                    Category subCategoryReference
                                    ) throws IOException {
 
-        try {
             Product product = productRepository.save(Product.builder()
                     .description(product_creation_dto.getDescription())
                     .brand(brandReference)
@@ -90,11 +94,9 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
                     .title(product_creation_dto.getTitle())
                     .build());
 
+            if (product.getId() == null) throw new DatabasePersistenceException("Unable to persist Product in Database " );
+
             return product.getId();
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to add teh Product");
-        }
 
     }
 
@@ -115,9 +117,9 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
                     .build();
 
              vendor_product_repository.save(vendor_product);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to link the product with the vendor");
+            throw new DatabasePersistenceException("Unable to link the product with the vendor");
         }
 
     }
@@ -128,8 +130,6 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
                                    ) throws IOException {
         try {
 
-            if(product_creation_dto.getImageFiles().size() > 6) throw new CustomRuntimeException("Cannot add images more than 6 Images");
-
             List<Vendor_Product_Image> vendor_product_imageList = new ArrayList<>(product_creation_dto.getImageFiles().size());
 
             for(MultipartFile imageFile : product_creation_dto.getImageFiles())
@@ -139,9 +139,9 @@ public class Product_Management_Service_Imp  implements Product_Management_Servi
                         .build());
 
             vendor_product_image_repository.saveAll(vendor_product_imageList);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to add Images for the Product");
+            throw new DatabasePersistenceException("Unable to add Images for the Product");
         }
 
 

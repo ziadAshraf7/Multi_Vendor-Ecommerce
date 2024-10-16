@@ -4,8 +4,9 @@ package com.example.ecommerce_app.Services.User;
 import com.example.ecommerce_app.Dto.User.UserCreationDto;
 import com.example.ecommerce_app.Dto.User.UserInfoDetails;
 import com.example.ecommerce_app.Entity.User;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.UserMapper;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
@@ -13,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -40,19 +40,16 @@ public class UserServiceImp implements UserService {
   }
 
   public User getUserEntityById(long userId , UserRoles userRole){
-     try {
-        return userRepository.getReferenceById(userId);
-     }catch (RuntimeException e){
-         log.error(e.getMessage());
-         throw new NotFoundException("user is not found");
-     }
-
-  }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomNotFoundException("user is not found for user id " + userId));
+        if(user.getUserRole() != userRole) throw new CustomConflictException("User is not " + userRole);
+        return user;
+   }
 
     @Override
     public User getUserEntityById(long userId) {
       User user = userRepository.getReferenceById(userId);
-      if(user == null) throw new NotFoundException("user is not found for user id" + userId);
+      if(user == null) throw new CustomNotFoundException("user is not found for user id" + userId);
       return user;
     }
 

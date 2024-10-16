@@ -5,8 +5,10 @@ import com.example.ecommerce_app.Dto.Category_Table.CategoryUpdateDto;
 import com.example.ecommerce_app.Dto.Category_Table.Parent_Category_Creation_Dto;
 import com.example.ecommerce_app.Dto.Category_Table.Sub_Category_Creation_Dto;
 import com.example.ecommerce_app.Entity.Category;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Mapper.CategoryMapper;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import lombok.AllArgsConstructor;
@@ -30,9 +32,9 @@ public class CategoryServiceImp implements CategoryService {
         Category category = categoryMapper.toParentCategoryEntity(parentCategoryCreationDto);
         try {
             categoryRepository.save(category);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to add category with name " + parentCategoryCreationDto.getName()  );
+            throw new DatabasePersistenceException("Unable to add category with name " + parentCategoryCreationDto.getName()  );
         }
     }
 
@@ -43,9 +45,9 @@ public class CategoryServiceImp implements CategoryService {
             Category subCategory = categoryMapper.toSubCategoryEntity(subCategoryCreationDto);
             subCategory.setParentCategory(parentCategory);
             categoryRepository.save(subCategory);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to add sub_category with name " + subCategoryCreationDto.getName());
+            throw new DatabasePersistenceException("Unable to add sub_category with name " + subCategoryCreationDto.getName());
         }
    }
 
@@ -57,7 +59,7 @@ public class CategoryServiceImp implements CategoryService {
 
         Category parentCategory = subCategory.getParentCategory();
 
-        if(parentCategory == null) throw new CustomRuntimeException(" category with id " + categoryId + " is not a sub_category");
+        if(parentCategory == null) throw new CustomConflictException(" category with id " + categoryId + " is not a sub_category");
 
         return subCategory;
     }
@@ -67,7 +69,7 @@ public class CategoryServiceImp implements CategoryService {
     public Category getParentCategoryEntityById(long categoryId) {
         Category parentCategory = getCategoryEntityById(categoryId);
 
-        if(parentCategory.getParentCategory() != null) throw new CustomRuntimeException("category with id "  + categoryId + " is a sub_category");
+        if(parentCategory.getParentCategory() != null) throw new CustomConflictException("category with id "  + categoryId + " is a sub_category");
 
         return parentCategory;
     }
@@ -84,9 +86,9 @@ public class CategoryServiceImp implements CategoryService {
             if(categoryUpdateDto.getDescription() != null) category.setDescription(category.getDescription());
 
             categoryRepository.save(category);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to update category with id " + categoryUpdateDto.getCategoryId() );
+            throw new DatabasePersistenceException("Unable to update category with id " + categoryUpdateDto.getCategoryId() );
         }
 
     }
@@ -94,12 +96,10 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public Category getCategoryEntityById(long categoryId) {
-        try {
-            return categoryRepository.getReferenceById(categoryId);
-        }catch (RuntimeException e){
-            throw new NotFoundException("Unable to find Category id " + categoryId);
-        }
-    }
+          return categoryRepository.findById(categoryId).orElseThrow(
+                    () -> new CustomNotFoundException("Unable to find category with category id " + categoryId)
+            );
+         }
 
 
 }

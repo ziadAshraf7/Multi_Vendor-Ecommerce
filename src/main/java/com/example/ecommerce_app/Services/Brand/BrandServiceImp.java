@@ -5,7 +5,9 @@ import com.example.ecommerce_app.Dto.Brand_Table.BrandResponseDto;
 import com.example.ecommerce_app.Dto.Brand_Table.BrandUpdateDto;
 import com.example.ecommerce_app.Entity.Brand;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.DatabaseInternalServerError;
+import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Mapper.BrandMapper;
 import com.example.ecommerce_app.Repositery.Brand.BrandRepository;
 import lombok.AllArgsConstructor;
@@ -30,9 +32,9 @@ public class BrandServiceImp implements BrandService {
 
         try {
             brandRepository.save(brand);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to add brand with name " + brandCreationDto.getName());
+            throw new DatabasePersistenceException("Unable to add brand with name " + brandCreationDto.getName());
         }
     }
 
@@ -49,24 +51,20 @@ public class BrandServiceImp implements BrandService {
     @Override
     @Transactional(readOnly = true)
     public BrandResponseDto getBrandByName(String brandName) {
-        try {
             Brand brand = brandRepository.findByName(brandName);
+            if(brand == null) throw new CustomNotFoundException("Unable to find brand by brand name " + brandName);
             return brandMapper.fromEntityToOverviewDto(brand);
-
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new NotFoundException("brand with name " + brandName + " is not found" );
-        }
-    }
+     }
 
     @Override
     @Transactional
     public void deleteBrandById(long brandId) {
         try {
+            getBrandEntityById(brandId);
             brandRepository.deleteById(brandId);
-        }catch (RuntimeException e){
+        }catch (DatabaseInternalServerError e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("unable to delete the brand with id " + brandId);
+            throw new DatabaseInternalServerError("unable to delete the brand with id " + brandId);
         }
     }
 
@@ -78,20 +76,18 @@ public class BrandServiceImp implements BrandService {
             if(brandUpdateDto.getName() != null) brand.setName(brandUpdateDto.getName());
             if (brandUpdateDto.getImage() != null) brand.setImage(brandUpdateDto.getImage().getBytes());
             brandRepository.save(brand);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to Update the Brand with id " + brandUpdateDto.getBrandId());
+            throw new DatabasePersistenceException("Unable to Update the Brand with id " + brandUpdateDto.getBrandId());
         }
     }
 
     @Override
     @Transactional(readOnly = true)
     public Brand getBrandEntityById(long brandId) {
-        try {
-            return brandRepository.getReferenceById(brandId);
-        }catch (RuntimeException e){
-            throw new NotFoundException("Unable to Find the Brand id " + brandId);
-        }
+         return  brandRepository.findById(brandId).orElseThrow(
+                    () -> new CustomNotFoundException("cannot find brand with brand id " + brandId)
+            );
     }
 
 }
