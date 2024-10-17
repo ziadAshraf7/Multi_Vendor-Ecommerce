@@ -6,8 +6,6 @@ import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Repositery.Cart.CartRepository;
-import com.example.ecommerce_app.Repositery.User.UserRepository;
-import com.example.ecommerce_app.Services.Cart.CartService;
 import com.example.ecommerce_app.Services.Cart.CartServiceImp;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 import org.junit.jupiter.api.BeforeEach;
