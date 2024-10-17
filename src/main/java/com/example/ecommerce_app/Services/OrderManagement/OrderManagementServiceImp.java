@@ -9,7 +9,7 @@ import com.example.ecommerce_app.Entity.OrderItem;
 import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Repositery.Order.OrderRepository;
 import com.example.ecommerce_app.Repositery.OrderItem.OrderItemRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
@@ -113,7 +113,7 @@ public class OrderManagementServiceImp implements OrderManagementService {
             return orderItemResponseDtos;
         }catch (RuntimeException e){
              log.error(e.getMessage());
-             throw new NotFoundException("Cannot find order items ");
+             throw new CustomNotFoundException("Cannot find order items ");
         }
     }
 

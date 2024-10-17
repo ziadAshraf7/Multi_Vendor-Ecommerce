@@ -3,11 +3,11 @@ package com.example.ecommerce_app.Services.Product;
 
 import com.example.ecommerce_app.Dto.Product_Table.*;
 import com.example.ecommerce_app.Entity.*;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.*;
 import com.example.ecommerce_app.Mapper.ProductMapper;
-import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
+import com.example.ecommerce_app.Repositery.Brand.BrandRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
+import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +30,8 @@ public class ProductServiceImp implements ProductService
   private final PageRequest pageable = PageRequest.of(0, 10);
 
 
+  private BrandService brandService;
+
     @Override
     @Transactional
     public Product_Overview_Dto updateProduct(Product_Update_Dto product_update_dto) {
@@ -45,9 +47,9 @@ public class ProductServiceImp implements ProductService
             productRepository.save(product);
 
             return productMapper.to_Product_Overview_Dto(product);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to update Product with id " + product_update_dto.getProductId());
+            throw new DatabasePersistenceException("Unable to update Product with id " + product_update_dto.getProductId());
         }
 
     }
@@ -56,6 +58,7 @@ public class ProductServiceImp implements ProductService
     @Transactional
     public void updateProductRating(int user_rate , Product product) {
         try {
+            if(user_rate > 5) throw new CustomBadRequestException("rate cannot be greater than 5");
             int productRatingCount = product.getRatingCount();
             int newProductRatingCount = productRatingCount + 1;
             int newRating = (user_rate / newProductRatingCount);
@@ -63,12 +66,10 @@ public class ProductServiceImp implements ProductService
             product.setRating(newRating);
 
             productRepository.save(product);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to Update product name  " + product.getName() );
+            throw new DatabasePersistenceException("Unable to Update product name  " + product.getName() );
         }
-
-
     }
 
     @Override
@@ -93,39 +94,27 @@ public class ProductServiceImp implements ProductService
     @Override
     @Transactional(readOnly = true)
     public Product_Detailed_Dto getProductByName(String name) {
-        try {
             Product product = productRepository.findByName(name);
+            if(product == null) throw new CustomNotFoundException("Unable to find product name " + name);
             return productMapper.to_Product_Detailed_Dto(product);
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new NotFoundException("Unable to find Product name " + name);
-        }
     }
 
 
     @Override
     @Transactional(readOnly = true)
     public Page<Product_Overview_Dto> getNewArrivalProducts(long categoryId) {
-        try {
+            categoryService.getCategoryEntityById(categoryId);
             Page<Product> products = productRepository.getFeaturedProducts(categoryId , pageable);
             return products.map(productMapper::to_Product_Overview_Dto);
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to retrieve the Products");
-        }
      }
 
 
     @Override
     @Transactional(readOnly = true)
     public Page<Product_Overview_Dto> getDiscountProducts(long categoryId) {
-        try {
-            Page<Product> products = productRepository.getDiscountProducts(categoryId , pageable);
-            return products.map(productMapper::to_Product_Overview_Dto);
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to retrieve the Products");
-        }
+        categoryService.getCategoryEntityById(categoryId);
+        Page<Product> products = productRepository.getDiscountProducts(categoryId , pageable);
+        return products.map(productMapper::to_Product_Overview_Dto);
       }
 
      @Override
@@ -162,28 +151,29 @@ public class ProductServiceImp implements ProductService
      @Transactional(readOnly = true)
      public Product getProductEntityById(long productId) {
          return productRepository.findById(productId)
-                 .orElseThrow(() -> new NotFoundException("Unable to find Product with Id " + productId));
+                 .orElseThrow(() -> new CustomNotFoundException("Unable to find Product with Id " + productId));
      }
 
      @Override
      public Page<Product_Overview_Dto> getProductsPerBrand(long brandId) {
-        try {
+
+            brandService.getBrandEntityById(brandId);
+
             Page<Product> products = productRepository.findByBrandId(brandId , pageable);
+
             return products.map(productMapper::to_Product_Overview_Dto);
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new NotFoundException("Unable to retrieve products of brand id " + brandId);
-        }
-     }
+
+          }
 
      @Override
      @Transactional
      public void removeProduct(long productId) {
         try {
+            getProductEntityById(productId);
             productRepository.deleteById(productId);
-        }catch (RuntimeException e){
+        }catch (DatabaseInternalServerError e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to delete product id " + productId);
+            throw new DatabaseInternalServerError("Unable to delete product id " + productId);
         }
     }
 

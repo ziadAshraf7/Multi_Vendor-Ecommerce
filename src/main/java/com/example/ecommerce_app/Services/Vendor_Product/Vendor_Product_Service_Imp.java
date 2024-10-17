@@ -6,10 +6,8 @@ import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Entity.Vendor_Product;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.Vendor_Product_Mapper;
-import com.example.ecommerce_app.Repositery.Product.ProductRepository;
-import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product.Vendor_Product_Repository;
 import com.example.ecommerce_app.Services.Product.ProductService;
 import com.example.ecommerce_app.Services.User.UserService;
@@ -45,7 +43,7 @@ public class Vendor_Product_Service_Imp implements Vendor_Product_Service {
 
         User vendor = userService.getUserEntityById(vendor_product_creation_dto.getVendorId() , UserRoles.ROLE_VENDOR);
 
-        Vendor_Product vendorProduct = vendor_product_mapper. toEntity(vendor_product_creation_dto );
+        Vendor_Product vendorProduct = vendor_product_mapper.toEntity(vendor_product_creation_dto );
 
         vendorProduct.setProduct(product);
         vendorProduct.setVendor(vendor);
@@ -75,7 +73,7 @@ public class Vendor_Product_Service_Imp implements Vendor_Product_Service {
             return vendor_product_repository.findByVendor_IdAndProduct_Id(productId , vendorId);
         }catch (RuntimeException e){
             log.error(e.getMessage());
-            throw new NotFoundException("can't retrieve product_vendor entity");
+            throw new CustomNotFoundException("can't retrieve product_vendor entity");
         }
     }
 }

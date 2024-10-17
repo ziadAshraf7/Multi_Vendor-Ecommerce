@@ -7,7 +7,7 @@ import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.ProductReview;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.ProductReview_Mapper;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.ProductReview.ProductReviewRepository;
@@ -55,7 +55,7 @@ public class ProductReviewServiceImp implements ProductReviewService{
             return productReview_detailed_dtos;
         }catch (RuntimeException e){
             log.error(e.getMessage());
-            throw new NotFoundException("Cannot retrieve Product Reviews for product id " + productId);
+            throw new CustomNotFoundException("Cannot retrieve Product Reviews for product id " + productId);
         }
 
 
@@ -74,7 +74,7 @@ public class ProductReviewServiceImp implements ProductReviewService{
             return productReview_detailed_dtos;
         }catch (RuntimeException e){
             log.error(e.getMessage());
-            throw new NotFoundException("Cannot retrieve User Reviews for user id " + UserId);
+            throw new CustomNotFoundException("Cannot retrieve User Reviews for user id " + UserId);
         }
 
     }
@@ -123,7 +123,7 @@ public class ProductReviewServiceImp implements ProductReviewService{
             );
           }catch (RuntimeException e){
                 log.error(e.getMessage());
-                throw new NotFoundException("unable to find the review");
+                throw new CustomNotFoundException("unable to find the review");
         }
 
         if(productReview_update_dto.getRate() != null) productReview.setRate(productReview_update_dto.getRate());

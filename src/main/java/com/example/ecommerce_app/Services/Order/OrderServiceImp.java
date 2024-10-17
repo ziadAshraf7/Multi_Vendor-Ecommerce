@@ -6,9 +6,8 @@ import com.example.ecommerce_app.Entity.Enums.OrderStatus;
 import com.example.ecommerce_app.Entity.Order;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Repositery.Order.OrderRepository;
-import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Services.User.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +43,7 @@ public class OrderServiceImp implements OrderService {
     @Override
     public OrderResponseDto getOrderData(long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> new NotFoundException("Cannot find the order id " + orderId)
+                () -> new CustomNotFoundException("Cannot find the order id " + orderId)
         );
 
         return OrderResponseDto
@@ -69,7 +68,7 @@ public class OrderServiceImp implements OrderService {
     public void updateOrder(OrderUpdateDto orderUpdateDto) {
 
         Order order = orderRepository.findById(orderUpdateDto.getOrderId())
-                .orElseThrow(() -> new NotFoundException("cannot find order  "));
+                .orElseThrow(() -> new CustomNotFoundException("cannot find order  "));
 
         Double newTotalAmount = orderUpdateDto.getTotalAmount();
 

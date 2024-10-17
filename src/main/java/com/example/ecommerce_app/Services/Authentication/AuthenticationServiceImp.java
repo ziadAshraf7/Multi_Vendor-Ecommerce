@@ -4,7 +4,7 @@ import com.example.ecommerce_app.Dto.Authentication.LoginDto;
 import com.example.ecommerce_app.Dto.Authentication.SuccessfulLoginInfo;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotAuhthorized;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomAuthorizationException;
 import com.example.ecommerce_app.Services.JWT.JwtService;
 import com.example.ecommerce_app.Services.User.UserService;
 import jakarta.servlet.http.Cookie;
@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,7 @@ public class AuthenticationServiceImp implements AuthenticationService{
         User user = userService.getUserEntityByEmail(loginDto.getEmail());
 
         if(!passwordEncoder.matches(loginDto.getPassword() , user.getPassword())){
-            throw new NotAuhthorized("Password is incorrect");
+            throw new CustomAuthorizationException("Password is incorrect");
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(

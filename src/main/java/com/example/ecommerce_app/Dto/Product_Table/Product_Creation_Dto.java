@@ -2,6 +2,7 @@ package com.example.ecommerce_app.Dto.Product_Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
+@Builder
 public class Product_Creation_Dto implements Serializable {
 
     @NotNull(message = "id can't be null")
@@ -43,6 +45,7 @@ public class Product_Creation_Dto implements Serializable {
 
     @JsonIgnore
     @NotNull(message = "imageFiles cannot be null")
+    @Size(max = 6 , min = 1 , message = "image Files cannot be greater than 6 or less than 1 image")
     List<MultipartFile> imageFiles;
 
     @NotNull(message = "stock cannot be null")

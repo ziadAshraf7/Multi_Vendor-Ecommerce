@@ -60,7 +60,7 @@ public class CartServiceImp implements CartService{
     @Override
     public Cart persistCartEntity(Cart cart) {
         try {
-         return   cartRepository.save(cart);
+         return cartRepository.save(cart);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
             throw new DatabasePersistenceException("Unable to Update Cart Entity");

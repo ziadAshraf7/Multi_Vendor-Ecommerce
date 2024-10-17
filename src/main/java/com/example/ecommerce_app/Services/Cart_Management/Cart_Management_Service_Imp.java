@@ -10,7 +10,7 @@ import com.example.ecommerce_app.Entity.CartItem;
 import com.example.ecommerce_app.Entity.Embedded_Ids.CartItem_EmbeddedId;
 import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.Vendor_Product;
-import com.example.ecommerce_app.Exceptions.Exceptions.BadRequestException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Mapper.CartItemMapper;
 import com.example.ecommerce_app.Repositery.CartItem.CartItemRepository;
@@ -99,9 +99,9 @@ public class Cart_Management_Service_Imp implements Cart_Management_Service{
 
             int productStock = vendor_product.getStock();
 
-            if(productStock == 0) throw new BadRequestException("product is ran out of stock");
+            if(productStock == 0) throw new CustomBadRequestException("product is ran out of stock");
 
-            if(cartItemCreationDto.getQuantity() > productStock) throw new BadRequestException("quantity selected is greater than product stock");
+            if(cartItemCreationDto.getQuantity() > productStock) throw new CustomBadRequestException("quantity selected is greater than product stock");
 
             cart.setTotalPrice(cart.getTotalPrice() + cartItemCreationDto.getQuantity() * vendor_product.getPrice());
 

@@ -2,7 +2,7 @@ package com.example.ecommerce_app.Services.CartItem;
 import com.example.ecommerce_app.Dto.CartItem.CartItemDto;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.NotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.CartItemMapper;
 import com.example.ecommerce_app.Repositery.CartItem.CartItemRepository;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ public class CartItemServiceImp implements CartItemService{
             return cartItemDtos;
         }catch (RuntimeException e){
             log.error(e.getMessage());
-            throw new NotFoundException("unable to retrieve cart items");
+            throw new CustomNotFoundException("unable to retrieve cart items");
         }
     }
 
