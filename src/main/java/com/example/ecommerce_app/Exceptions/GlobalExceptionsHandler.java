@@ -27,13 +27,6 @@ public class GlobalExceptionsHandler {
     }
 
 
-    @ExceptionHandler(ImageNumberExceededException.class)
-    public ResponseEntity<ErrorResponse> handleImageNumberExceededException(ImageNumberExceededException ex) {
-        return new ResponseEntity<>(
-                new ErrorResponse(ex.getMessage() , HttpStatus.BAD_REQUEST.value()) , HttpStatus.BAD_REQUEST
-        );
-    }
-
     @ExceptionHandler(CustomNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(CustomNotFoundException ex) {
         return new ResponseEntity<>(
