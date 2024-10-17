@@ -3,6 +3,7 @@ package com.example.ecommerce_app.Entity;
 import com.example.ecommerce_app.Entity.Enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @Data
-@Builder
+@SuperBuilder
 @Table(name = "order" ,
         indexes = {
         @Index(name = "idx_customer_created_status",

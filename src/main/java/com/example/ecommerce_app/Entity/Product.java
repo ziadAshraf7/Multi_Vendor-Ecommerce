@@ -14,7 +14,7 @@ import java.util.*;
 @Table(name = "product")
 @Data
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @NamedEntityGraph(
         name = "product-without-brand-category",
         attributeNodes = {

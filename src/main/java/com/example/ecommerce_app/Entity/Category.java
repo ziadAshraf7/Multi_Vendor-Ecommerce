@@ -13,7 +13,7 @@ import java.util.*;
 @Entity
 @Table(name = "category")
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 public class Category extends BaseEntity {
 

@@ -17,7 +17,7 @@ import java.util.*;
 @Entity
 @Table(name = "user")
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 public class User extends BaseEntity {
 
