@@ -1,5 +1,6 @@
 package com.example.ecommerce_app.Services;
 
+import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
@@ -9,6 +10,7 @@ import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceExcept
 import com.example.ecommerce_app.Mapper.ProductMapper;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
+import com.example.ecommerce_app.Repositery.ProductAttributeValue.ProductAttributeValueRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product.Vendor_Product_Repository;
 import com.example.ecommerce_app.Repositery.Vendor_Product_Image.Vendor_Product_Image_Repository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
@@ -28,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -50,6 +54,9 @@ public class ProductManagementServiceTest {
 
     @Mock
     private  UserServiceImp userServiceImp;
+
+    @Mock
+    private ProductAttributeValueRepository productAttributeValueRepository;
 
     @Mock
     private  Vendor_Product_Image_Repository vendor_product_image_repository;
@@ -87,6 +94,7 @@ public class ProductManagementServiceTest {
                 .thumbNail( mockThumbNail)
                 .subCategoryId(1L)
                 .vendorId(1L)
+                .productAttributesWithValues(Map.of(AttributeDto.builder().name("MoDel").attributeId(1L).build() , List.of("458bca")))
                 .imageFiles(List.of(mockThumbNail))
                 .build();
 
@@ -97,7 +105,7 @@ public class ProductManagementServiceTest {
     }
 
     @Test
-    @DisplayName("Persisting Product Entity with Linking with a Vendor and Adding Product Images ")
+    @DisplayName("Persisting Product Entity with Linking with a Vendor and Adding Product Images and Attributes attached values ")
     void ProductManagementServiceAddProductReturnsVoid() throws IOException {
 
         Vendor_Product vendor_product = Vendor_Product.builder().id(new Vendor_Product_EmbeddedId()).product(product).vendor(vendor).stock(5).price(50.0).build();
@@ -109,9 +117,16 @@ public class ProductManagementServiceTest {
                 .image(mockThumbNail.getBytes())
                 .build()));
 
+        List<ProductAttributeValue> attributeValues = new ArrayList<>(List.of(
+                ProductAttributeValue.builder().product(product)
+                        .attribute(Attribute.builder().build())
+                        .build()));
+
+
         when(mockThumbNail.getBytes()).thenReturn(new byte[]{});
         when(brandService.getBrandEntityById(1L)).thenReturn(brand);
         when(categoryService.getSubCategoryEntityById(1L)).thenReturn(subCategory);
+        when(productAttributeValueRepository.saveAll(anyList())).thenReturn(attributeValues);
         when(userServiceImp.getUserEntityById(1L , UserRoles.ROLE_VENDOR)).thenReturn(vendor);
         when(productRepository.save(any(Product.class))).thenReturn(product);
         when(vendor_product_repository.save(any(Vendor_Product.class))).thenReturn(vendor_product);
@@ -126,6 +141,7 @@ public class ProductManagementServiceTest {
         verify(brandService).getBrandEntityById(1L);
         verify(categoryService).getSubCategoryEntityById(1L);
         verify(userServiceImp).getUserEntityById(1L, UserRoles.ROLE_VENDOR);
+        verify(productAttributeValueRepository).saveAll(anyList());
         verify(productRepository).save(any(Product.class));
         verify(vendor_product_repository).save(any(Vendor_Product.class) );
         verify(vendor_product_image_repository).saveAll(anyList());

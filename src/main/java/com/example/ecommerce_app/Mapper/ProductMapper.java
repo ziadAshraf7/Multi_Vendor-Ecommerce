@@ -1,6 +1,8 @@
 package com.example.ecommerce_app.Mapper;
 
 
+import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
+import com.example.ecommerce_app.Dto.ProductAttributeValueTable.ProductAttributeValueDto;
 import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Detailed_Dto;
@@ -49,10 +51,37 @@ public interface ProductMapper {
             @Mapping( target = "subCategoryName" , expression = "java(product.getSubCategoryName())") ,
             @Mapping(source = "vendor_products" , target = "vendor_products_dtos" , qualifiedByName = "mapToVendorProductDto") ,
             @Mapping(source = "images" , target = "images" , qualifiedByName = "mapToImages") ,
-            @Mapping(source = "reviews" , target = "reviewsDtos" , qualifiedByName = "mapTo_ProductReview_Detailed_Dto")
+            @Mapping(source = "reviews" , target = "reviewsDtos" , qualifiedByName = "mapTo_ProductReview_Detailed_Dto"),
+            @Mapping(source = "attributeValues" , target = "attributeDtoListMap" , qualifiedByName = "mapToAttributeValuesDetails")
     })
     Product_Detailed_Dto to_Product_Detailed_Dto(Product product);
 
+    @Named("mapToAttributeValuesDetails")
+    default Map<AttributeDto, List<ProductAttributeValueDto>>  mapToAttributeValuesDetails(
+            List<ProductAttributeValue> attributeValues){
+
+        Map<AttributeDto, List<ProductAttributeValueDto>> map = new HashMap<>();
+
+        attributeValues.forEach(productAttributeValue -> {
+            AttributeDto attributeDto = AttributeDto.builder()
+                    .attributeId(productAttributeValue.getAttribute().getId())
+                    .name(productAttributeValue.getAttribute().getName())
+                    .build();
+
+            ProductAttributeValueDto productAttributeValueDto = ProductAttributeValueDto
+                    .builder()
+                    .value(productAttributeValue.getValue())
+                    .build();
+
+            map.compute(attributeDto , (key , value) -> {
+                if(value == null) return new ArrayList<>();
+                value.add(productAttributeValueDto);
+                return value;
+            });
+        });
+
+        return map;
+    }
 
     @Named("mapTo_ProductReview_Detailed_Dto")
     default List<ProductReview_Detailed_Dto>  mapTo_ProductReview_Detailed_Dto(List<ProductReview> reviews){

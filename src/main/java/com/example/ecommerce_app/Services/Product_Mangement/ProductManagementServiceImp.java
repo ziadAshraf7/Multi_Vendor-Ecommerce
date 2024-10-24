@@ -1,15 +1,16 @@
 package com.example.ecommerce_app.Services.Product_Mangement;
 
 
+import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
-import com.example.ecommerce_app.Exceptions.Exceptions.ImageNumberExceededException;
 import com.example.ecommerce_app.Mapper.ProductMapper;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
+import com.example.ecommerce_app.Repositery.ProductAttributeValue.ProductAttributeValueRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product_Image.Vendor_Product_Image_Repository;
 import com.example.ecommerce_app.Repositery.Vendor_Product.Vendor_Product_Repository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
@@ -20,8 +21,6 @@ import com.example.ecommerce_app.Utills.UtilsClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Data
@@ -52,6 +52,8 @@ public class ProductManagementServiceImp implements Product_Management_Service{
 
     private final CategoryService categoryService;
 
+    private final ProductAttributeValueRepository productAttributeValueRepository;
+
     @Override
     @Transactional
     public void addProduct(Product_Creation_Dto product_creation_dto) {
@@ -66,6 +68,8 @@ public class ProductManagementServiceImp implements Product_Management_Service{
             long productId = saveProductEntity(product_creation_dto , brandReference , subCategoryReference);
 
             Product productReference = productRepository.getReferenceById(productId);
+
+            addAttributesWithValuesToProduct(product_creation_dto.getProductAttributesWithValues() , productReference);
 
             saveVendorProductEntity(product_creation_dto , productReference , vendorReference);
 
@@ -147,4 +151,41 @@ public class ProductManagementServiceImp implements Product_Management_Service{
 
     }
 
+    @Transactional
+    private void addAttributesWithValuesToProduct(
+            Map<AttributeDto, List<String>> attrValues ,
+            Product productReference
+            ){
+
+        List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
+
+        for(Map.Entry<AttributeDto , List<String>> entry : attrValues.entrySet()){
+
+            Attribute attribute = Attribute.builder()
+                    .name(entry.getKey().getName().toLowerCase())
+                    .id(entry.getKey().getAttributeId())
+                    .build();
+
+            for(String value : entry.getValue()){
+                productAttributeValues.add(
+                        ProductAttributeValue
+                                .builder()
+                                .attribute(attribute)
+                                .product(productReference)
+                                .value(value)
+                                .build()
+                );
+            }
+        }
+
+
+
+
+        try {
+            productAttributeValueRepository.saveAll(productAttributeValues);
+        }catch (DatabasePersistenceException e){
+            log.error(e.getMessage());
+            throw new DatabasePersistenceException("Database Error while persisting product attribute with value");
+        }
+    }
 }

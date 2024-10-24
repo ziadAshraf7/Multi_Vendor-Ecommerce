@@ -1,4 +1,5 @@
 package com.example.ecommerce_app.Dto.Product_Table;
+import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Data
@@ -60,4 +62,6 @@ public class Product_Creation_Dto implements Serializable {
     @NotNull(message = "discount cannot be null")
     private double discount;
 
+    @NotNull
+    Map<AttributeDto, List<String>> productAttributesWithValues;
 }
