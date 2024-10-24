@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 
 @Entity
 @Table(name = "product_attribute_value")
 @Builder
 @AllArgsConstructor
-public class Product_Attribute_Value {
+@Data
+public class ProductAttributeValue {
 
      @Id
      @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +25,10 @@ public class Product_Attribute_Value {
 
 
      @ManyToOne(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST})
-     @JoinColumn(name = "sub_category_attribute_id")
-     private Sub_Category_Attribute subCategoryAttribute;
+     @JoinColumn(name = "attribute_id")
+     private Attribute attribute;
 
+     @ManyToOne(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST})
+     @JoinColumn(name = "product_id")
+     private Product product;
 }

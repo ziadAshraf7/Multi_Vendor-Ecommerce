@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.w3c.dom.Attr;
 
 import java.util.*;
 
@@ -54,14 +55,20 @@ public class Category extends BaseEntity {
     @JoinTable(
             name = "sub_category_attributes",
             joinColumns = { @JoinColumn(name = "sub_category_id") },
-            inverseJoinColumns = { @JoinColumn(name = "sub_category_attribute_id") }
+            inverseJoinColumns = { @JoinColumn(name = "attribute_id") }
     )
-    private final Set<Sub_Category_Attribute> subCategoryAttributes = new HashSet<>();
+    private  Set<Attribute> subCategoryAttributes ;
 
 
     public void addSubCategory(Category category){
         subCategories.add(category);
     }
 
+    public void addAttribute(Attribute attribute){
+        subCategoryAttributes.add(attribute);
+    }
 
+    public void removeAttribute(Attribute attribute){
+        subCategoryAttributes.remove(attribute);
+    }
 }

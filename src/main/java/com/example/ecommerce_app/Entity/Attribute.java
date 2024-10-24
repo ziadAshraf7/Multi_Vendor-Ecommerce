@@ -6,15 +6,14 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "sub_category_attribute")
+@Table(name = "attribute")
 @Data
 @Builder
 @AllArgsConstructor
-public class Sub_Category_Attribute {
+public class Attribute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,17 +26,9 @@ public class Sub_Category_Attribute {
     @ManyToMany(cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JoinTable(
             name = "sub_category_attributes",
-            joinColumns = { @JoinColumn(name = "sub_category_attribute_id") },
+            joinColumns = { @JoinColumn(name = "attribute_id") },
             inverseJoinColumns = { @JoinColumn(name = "sub_category_id") }
     )
     private final Set<Category> subCategories;
-
-    @OneToMany(mappedBy = "subCategoryAttribute" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
-    private final List<Product_Attribute_Value> values;
-
-
-    public void addValue(Product_Attribute_Value productAttributeValue){
-        values.add(productAttributeValue);
-    }
 
 }
