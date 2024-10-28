@@ -31,13 +31,8 @@ public class UserCreationDto {
     private String phoneNumber;
 
 
-    @NotNull
-    private UserRoles userRole;
-
-
     @NotEmpty
     @NotNull
     private String address;
-
 
 }

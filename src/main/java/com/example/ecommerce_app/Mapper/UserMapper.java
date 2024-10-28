@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(source = "userRole" , target = "userRole")
+    @Mapping(target = "email" , expression = "java(userCreationDto.getEmail().toLowerCase())")
     User toEntity(UserCreationDto userCreationDto);
 
     UserInfoDetails toUserInfoDetails(User user);

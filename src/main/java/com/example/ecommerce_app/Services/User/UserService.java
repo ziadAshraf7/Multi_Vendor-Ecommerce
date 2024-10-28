@@ -7,7 +7,11 @@ import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 
 public interface UserService {
 
-     User addUser(UserCreationDto userCreationDto);
+     User addAdminUser(UserCreationDto userCreationDto);
+
+     User addVendorUser(UserCreationDto userCreationDto);
+
+     User addCustomerUser(UserCreationDto userCreationDto);
 
      User getUserEntityById(long userId , UserRoles userRole);
 

@@ -7,6 +7,7 @@ import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Mapper.UserMapper;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -27,19 +29,80 @@ public class UserServiceImp implements UserService {
 
   private PasswordEncoder passwordEncoder;
 
-  @Override
-  public User addUser(UserCreationDto userCreationDto){
-      try {
-        User user = userMapper.toEntity(userCreationDto);
-        user.setPassword(passwordEncoder.encode(userCreationDto.getPassword()));
-        return  userRepository.save(user);
-      }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to add User");
-      }
-  }
+    private User getUserByPhoneNumber(String phoneNumber){
 
-  public User getUserEntityById(long userId , UserRoles userRole){
+        return userRepository.findByPhoneNumber(phoneNumber);
+    }
+
+
+    @Transactional
+    @Override
+    public User addAdminUser(UserCreationDto userCreationDto) {
+
+            User existingUserWithPhoneNumber =  getUserByPhoneNumber(userCreationDto.getPhoneNumber());
+            User existingUserWithEmail = getUserEntityByEmail(userCreationDto.getEmail());
+            if(existingUserWithEmail != null) throw new CustomConflictException("Email is Already exists");
+            if(existingUserWithPhoneNumber != null) throw new CustomConflictException("Phone Number is Already exists");
+
+            User user = userMapper.toEntity(userCreationDto);
+            user.setUserRole(UserRoles.ROLE_ADMIN);
+            user.setPassword(passwordEncoder.encode(userCreationDto.getPassword()));
+
+            try {
+                return  userRepository.save(user);
+
+            }catch (DatabasePersistenceException e){
+                log.error(e.getMessage());
+                throw new DatabasePersistenceException("Database Error While Persisting User Entity");
+            }
+
+    }
+
+
+    @Transactional
+    @Override
+    public User addVendorUser(UserCreationDto userCreationDto) {
+            User existingUserWithPhoneNumber =  getUserByPhoneNumber(userCreationDto.getPhoneNumber());
+            User existingUserWithEmail = getUserEntityByEmail(userCreationDto.getEmail());
+            if(existingUserWithEmail != null) throw new CustomConflictException("Email is Already exists");
+            if(existingUserWithPhoneNumber != null) throw new CustomConflictException("Phone Number is Already exists");
+
+            User user = userMapper.toEntity(userCreationDto);
+            user.setUserRole(UserRoles.ROLE_VENDOR);
+            user.setPassword(passwordEncoder.encode(userCreationDto.getPassword()));
+
+        try {
+            return  userRepository.save(user);
+
+        }catch (DatabasePersistenceException e){
+            log.error(e.getMessage());
+            throw new DatabasePersistenceException("Database Error While Persisting User Entity");
+        }
+
+    }
+
+    @Transactional
+    @Override
+    public User addCustomerUser(UserCreationDto userCreationDto) {
+            User existingUserWithPhoneNumber =  getUserByPhoneNumber(userCreationDto.getPhoneNumber());
+            User existingUserWithEmail = getUserEntityByEmail(userCreationDto.getEmail());
+            if(existingUserWithEmail != null) throw new CustomConflictException("Email is Already exists");
+            if(existingUserWithPhoneNumber != null) throw new CustomConflictException("Phone Number is Already exists");
+
+            User user = userMapper.toEntity(userCreationDto);
+            user.setUserRole(UserRoles.ROLE_CUSTOMER);
+            user.setPassword(passwordEncoder.encode(userCreationDto.getPassword()));
+
+        try {
+            return  userRepository.save(user);
+        }catch (DatabasePersistenceException e){
+            log.error(e.getMessage());
+            throw new DatabasePersistenceException("Database Error While Persisting User Entity");
+        }
+
+    }
+
+    public User getUserEntityById(long userId , UserRoles userRole){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomNotFoundException("user is not found for user id " + userId));
         if(user.getUserRole() != userRole) throw new CustomConflictException("User is not " + userRole);
@@ -48,30 +111,22 @@ public class UserServiceImp implements UserService {
 
     @Override
     public User getUserEntityById(long userId) {
-      User user = userRepository.getReferenceById(userId);
-      if(user == null) throw new CustomNotFoundException("user is not found for user id" + userId);
-      return user;
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomNotFoundException("user is not found for user id " + userId));
     }
 
     @Override
     public UserInfoDetails getUserByEmail(String Email) {
-      try {
           User user = userRepository.findByEmail(Email);
+          if(user == null) throw new CustomNotFoundException("Cannot find Email " + Email);
           return userMapper.toUserInfoDetails(user);
-      }catch (RuntimeException e){
-          log.error(e.getMessage());
-          throw new CustomRuntimeException("User Email" + Email + "is not Found");
-      }
     }
 
     @Override
     public User getUserEntityByEmail(String email) {
-        try {
-           return userRepository.findByEmail(email);
-
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("User Email" + email + "is not Found");
-        }    }
+        User user = userRepository.findByEmail(email);
+        if(user == null) throw new CustomNotFoundException("Cannot find Email " + email);
+        return user;
+    }
 
 }
