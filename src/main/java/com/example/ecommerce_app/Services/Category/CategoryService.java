@@ -19,4 +19,5 @@ public interface CategoryService {
 
     Category getCategoryEntityById(long categoryId);
 
+    Category getCategoryEntityByName(String name);
 }

@@ -29,6 +29,9 @@ public class CategoryServiceImp implements CategoryService {
 
     @Transactional
     public void addParentCategory(Parent_Category_Creation_Dto parentCategoryCreationDto){
+        Category existingCategoryByName = getCategoryEntityByName(parentCategoryCreationDto.getName());
+        if(existingCategoryByName != null) throw new CustomConflictException("Category with name " + parentCategoryCreationDto.getName() + " is already exists" );
+
         Category category = categoryMapper.toParentCategoryEntity(parentCategoryCreationDto);
         try {
             categoryRepository.save(category);
@@ -41,6 +44,9 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional
     public void addSubCategory(Sub_Category_Creation_Dto subCategoryCreationDto){
         try {
+            Category existingCategoryByName = getCategoryEntityByName(subCategoryCreationDto.getName());
+            if(existingCategoryByName != null) throw new CustomConflictException("Category with name " + subCategoryCreationDto.getName() + " is already exists" );
+
             Category parentCategory = getParentCategoryEntityById(subCategoryCreationDto.getParentCategoryId());
             Category subCategory = categoryMapper.toSubCategoryEntity(subCategoryCreationDto);
             subCategory.setParentCategory(parentCategory);
@@ -100,6 +106,12 @@ public class CategoryServiceImp implements CategoryService {
                     () -> new CustomNotFoundException("Unable to find category with category id " + categoryId)
             );
          }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Category getCategoryEntityByName(String name) {
+        return categoryRepository.findByName(name);
+    }
 
 
 }
