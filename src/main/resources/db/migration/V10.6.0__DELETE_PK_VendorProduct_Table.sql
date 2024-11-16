@@ -1,0 +1,3 @@
+
+ALTER TABLE vendor_product
+DROP PRIMARY KEY;
