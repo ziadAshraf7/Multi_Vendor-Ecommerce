@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Notification.DataModel;
+package com.example.ecommerce_app.Services.NotificationService.DataModel;
 
 
 import lombok.AllArgsConstructor;
@@ -12,8 +12,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 @NoArgsConstructor
-public class ProductCreationNotificationRequest extends NotificationData {
+public class PendingProductApprovalNotificationMessage extends NotificationData {
 
-     private  String productName;
+  private ProductApprovalStatus productApprovalStatus;
 
 }

@@ -1,8 +1,8 @@
-package com.example.ecommerce_app.Notification.Services;
+package com.example.ecommerce_app.Services.NotificationService.Services;
 
 
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Notification.DataModel.NotificationData;
+import com.example.ecommerce_app.Services.NotificationService.DataModel.NotificationData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class NotificationListenerService {
             }else {
                 System.out.println("Not my Message");
             }
-        }catch (RuntimeException e){
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException(e.getMessage());
         }
