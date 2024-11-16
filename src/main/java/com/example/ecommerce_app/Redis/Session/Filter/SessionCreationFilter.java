@@ -1,7 +1,7 @@
 package com.example.ecommerce_app.Redis.Session.Filter;
 
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Redis.Session.Session_Management.SessionService;
+import com.example.ecommerce_app.Redis.Session.SessionManagement.SessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,12 @@ public class SessionCreationFilter extends OncePerRequestFilter {
             if (request.getSession(false) == null){
                 sessionService.createSession(request.getSession(true));
             }
-        }catch (RuntimeException e){
+            if(request.getSession(false) != null){
+                if(sessionService.getSessionData(request.getSession(false).getId()) == null){
+                    sessionService.createSession(request.getSession(true));
+                };
+            }
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Error while Creating new User Session");
         }

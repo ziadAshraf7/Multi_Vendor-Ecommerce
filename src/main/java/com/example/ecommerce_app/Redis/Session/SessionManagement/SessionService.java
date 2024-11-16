@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Redis.Session.Session_Management;
+package com.example.ecommerce_app.Redis.Session.SessionManagement;
 
 import jakarta.servlet.http.HttpSession;
 
