@@ -1,23 +1,27 @@
 package com.example.ecommerce_app.Redis.Session.AnonymousUser;
 
 import com.example.ecommerce_app.Dto.CartItem.*;
-import com.example.ecommerce_app.Dto.CartItem.Session.SessionUserCartItemQuantityDto;
-import com.example.ecommerce_app.Entity.Vendor_Product;
+import com.example.ecommerce_app.Entity.Product;
+import com.example.ecommerce_app.Entity.VendorProduct;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Mapper.CartItemMapper;
-import com.example.ecommerce_app.Redis.Session.Session_Management.UserCartSessionServiceImp;
+import com.example.ecommerce_app.Redis.Session.SessionManagement.UserCartSessionServiceImp;
 import com.example.ecommerce_app.Repositery.CartItem.CartItemRepository;
+import com.example.ecommerce_app.Repositery.Product.ProductRepository;
+import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Cart.CartService;
 import com.example.ecommerce_app.Services.Product.ProductService;
-import com.example.ecommerce_app.Redis.Session.Session_Management.SessionService;
+import com.example.ecommerce_app.Redis.Session.SessionManagement.SessionService;
 import com.example.ecommerce_app.Services.Vendor_Product.Vendor_Product_Service;
-import com.example.ecommerce_app.Utills.UtilsClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -39,94 +43,91 @@ public class AnonymousCartServiceImp implements AnonymousCartService{
 
     private final CartItemMapper cartItemMapper;
 
+    private final ProductRepository productRepository;
+
+    private final VendorProductRepository vendorProductRepository;
 
     @Override
-    public void addToCart(CartItemDto cartItem , String  sessionId) {
+    public void addToCart(CartItemDto cartItemDto , String  sessionId) {
         try {
-
             AnonymousUserCartData anonymousUserCartData = (AnonymousUserCartData) sessionService.getSessionData(sessionId);
-
-            if(anonymousUserCartData.getCartItem(cartItem.getProductId()) == null){
-                anonymousUserCartData.addToCartItems(cartItem);
+            VendorProduct vendorProduct = vendorProductRepository.findById(cartItemDto.getVendorProductId())
+                    .orElseThrow(() -> new CustomNotFoundException("Cannot get vendorProduct item"));
+            cartItemDto.setProductId(vendorProduct.getProduct().getId());
+            if(anonymousUserCartData.getCartItem(cartItemDto.getProductId() , cartItemDto.getVendorProductId()) == null){
+                anonymousUserCartData.addToCartItems(cartItemDto);
+                sessionService.addToSession(sessionId , anonymousUserCartData);
             }
-
-            sessionService.addToSession(sessionId , anonymousUserCartData);
-        }catch (RuntimeException e){
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Failed While Adding Product to Cart ");
         }
-
     }
 
 
     @Override
-    public List<CartItemDto> getCartItemsBySessionId(String sessionId) {
+    public List<CartItemResponseDto> getCartItemsBySessionId(String sessionId) {
         try {
             AnonymousUserCartData anonymousUserCartData = (AnonymousUserCartData) sessionService.getSessionData(sessionId);
-            List<CartItemDto> sessionCartItems = anonymousUserCartData.getCartItems();
+            if(anonymousUserCartData == null) return new ArrayList<>();
+            List<CartItemDto> cartItemDtos = anonymousUserCartData.getCartItems();
 
-            for(CartItemDto sessionCartItem : sessionCartItems){
+            List<Long> vendorProductsIds = new ArrayList<>(cartItemDtos.size());
+            cartItemDtos.forEach((ci) -> {
+                vendorProductsIds.add(ci.getVendorProductId());
+            });
 
-                Vendor_Product vendor_product = vendor_product_service.getByVendorIdAndProductId(
-                        sessionCartItem.getVendorId() ,
-                        sessionCartItem.getProductId()
-                );
+            List<VendorProduct> vendorProducts = vendorProductRepository.findAllById(vendorProductsIds);
 
-                // In case of Changed Price from the Owner Vendor
-                double vendor_product_price = vendor_product.getPrice();
-                double vendor_product_discount = vendor_product.getDiscount();
-                if(vendor_product_price != sessionCartItem.getPrice()) sessionCartItem.setPrice(vendor_product_price);
-                if(vendor_product_discount != sessionCartItem.getDiscount()) sessionCartItem.setDiscount(vendor_product_discount);
+            List<CartItemResponseDto> cartItemResponseDtoList = new ArrayList<>(cartItemDtos.size());
 
-                double oldTotalPricePerProduct = UtilsClass.calcProductFinalPrice(
-                        sessionCartItem.getPrice() , sessionCartItem.getDiscount())
-                        *
-                        sessionCartItem.getQuantity();
+            vendorProducts.sort(Comparator.comparing(VendorProduct::getId));
+            cartItemDtos.sort(Comparator.comparing(CartItemDto::getVendorProductId));
 
-                double newOldTotalPricePerProduct = UtilsClass.calcProductFinalPrice(
-                        vendor_product_price , vendor_product_discount) * sessionCartItem.getQuantity();
-
-
-                double oldTotalCartPrice = anonymousUserCartData.getTotalCartPrice();
-
-                double newTotalCartPrice = ( oldTotalCartPrice - oldTotalPricePerProduct ) + newOldTotalPricePerProduct;
-
-                anonymousUserCartData.setTotalCartPrice(newTotalCartPrice);
-
+            for(int i = 0 ; i < vendorProducts.size() ; i++){
+                VendorProduct vendorProduct = vendorProducts.get(i);
+                CartItemDto cartItemDto = cartItemDtos.get(i);
+                Product product = vendorProduct.getProduct();
+                cartItemResponseDtoList.add(CartItemResponseDto
+                        .builder()
+                                .productName(product.getName())
+                                .price(vendorProduct.getPrice())
+                                .quantity(cartItemDto.getQuantity())
+                                .title(product.getTitle())
+                                .thumbNail(product.getThumbNail())
+                                .vendorProductId(vendorProduct.getId())
+                                .productId(product.getId())
+                        .build());
             }
 
-            sessionService.addToSession(sessionId , anonymousUserCartData);
-            return anonymousUserCartData.getCartItems();
-        }catch (RuntimeException e){
+            return cartItemResponseDtoList;
+       }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Failed While Retrieving Cart Products");
-
         }
-
     }
 
     @Override
-    public void modifyCartItemQuantity(SessionUserCartItemQuantityDto sessionUserCartItemQuantityDto, String sessionId) {
+    public void modifyCartItemQuantity(CartItemQuantityDto sessionUserCartItemQuantityDto, String sessionId) {
       try {
           AnonymousUserCartData anonymousUserCartData = (AnonymousUserCartData) sessionService.getSessionData(sessionId);
-          AnonymousUserCartData anonymousUserCartData1 =  anonymousUserCartData.updateCartItemData(
+          anonymousUserCartData.updateCartItemData(
                   sessionUserCartItemQuantityDto.getProductId(),
-                  sessionUserCartItemQuantityDto.getQuantity() ,
-                  sessionUserCartItemQuantityDto.getProductPrice()
+                  sessionUserCartItemQuantityDto.getVendorProductId(),
+                  sessionUserCartItemQuantityDto.getQuantity()
           );
           sessionService.addToSession(sessionId , anonymousUserCartData);
-      }catch (RuntimeException e){
+      }catch (CustomRuntimeException e){
           throw new CustomRuntimeException("Failed While Updating the Cart Item Quantity");
       }
-
     }
 
     @Override
     public void removeFromCart(RemoveFromCartDto removeFromCartDto, String sessionId) {
         try {
             AnonymousUserCartData anonymousUserCartData = (AnonymousUserCartData) sessionService.getSessionData(sessionId);
-            anonymousUserCartData.removeFromCartItems(removeFromCartDto.getProductId());
-        }catch (RuntimeException e){
+            anonymousUserCartData.removeFromCartItems(removeFromCartDto.getProductId() , removeFromCartDto.getVendorProductId());
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Failed While Deleting From Cart");
         }
@@ -137,13 +138,11 @@ public class AnonymousCartServiceImp implements AnonymousCartService{
         try {
             AnonymousUserCartData anonymousUserCartData = ((UserCartSessionServiceImp) sessionService).getSessionData(sessionId);
             anonymousUserCartData.setCartItems(List.of());
-            anonymousUserCartData.setTotalCartPrice(0);
             sessionService.addToSession(sessionId , anonymousUserCartData);
-        }catch (RuntimeException e){
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Failed While Deleting From Cart");
         }
-
     }
 
 

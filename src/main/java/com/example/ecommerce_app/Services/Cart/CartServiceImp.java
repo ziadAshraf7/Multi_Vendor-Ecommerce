@@ -8,6 +8,7 @@ import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Repositery.Cart.CartRepository;
 import com.example.ecommerce_app.Services.User.UserService;
+import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +29,20 @@ public class CartServiceImp implements CartService{
     @Override
     public void createUserCart(User customer ) {
 
-        try {
 
             if(customer == null ) throw new CustomBadRequestException("Customer Entity cannot be null");
 
+            if(customer.getUserRole() != UserRoles.ROLE_CUSTOMER) throw new CustomBadRequestException("User is not a customer user");
+
+            Cart existibgCart = cartRepository.findByCustomerId(customer.getId());
+
+            if(existibgCart != null) throw new CustomBadRequestException("User cannot have multiple carts");
+
             Cart cart =  Cart.builder()
-                    .totalPrice(0.0)
                     .customer(customer)
                     .build();
-
+        try {
             cartRepository.save(cart);
-
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
             throw new DatabasePersistenceException("Unable to create cart for user id " + customer.getId());
@@ -47,13 +51,12 @@ public class CartServiceImp implements CartService{
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Cart getCartByCustomerId(long customerId) {
-          Cart cart = cartRepository.findByCustomerId(customerId);
-
-          if(cart == null) throw new CustomNotFoundException("customer user is not found for user id " + customerId);
-
-          return cart;
+          return cartRepository.findById(customerId).orElseThrow(
+                  () -> new CustomNotFoundException("cart is not found for user id " + customerId )
+          );
     }
 
     @Transactional

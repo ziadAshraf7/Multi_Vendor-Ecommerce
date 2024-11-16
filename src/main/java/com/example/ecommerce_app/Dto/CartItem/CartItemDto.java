@@ -1,32 +1,27 @@
 package com.example.ecommerce_app.Dto.CartItem;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.io.Serializable;
 
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-@Builder
-public class CartItemDto {
+@SuperBuilder
+public class CartItemDto implements Serializable {
 
+    @NotNull(message = "productId cannot be null")
     private long productId;
 
-    private long vendorId;
+    @NotNull(message = "vendorProductId cannot be null")
+    private long vendorProductId;
 
-    private String name;
-
-    private String title;
-
-    private int rating;
-
-    private byte[] thumbNail;
-
+    @NotNull(message = "quantity cannot be null")
     private int quantity;
-
-    private double price;
-
-    private double discount;
 
 }

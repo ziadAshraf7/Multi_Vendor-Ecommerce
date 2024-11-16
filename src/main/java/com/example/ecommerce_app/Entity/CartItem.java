@@ -26,18 +26,14 @@ public class CartItem {
     @Column(name = "quantity" , nullable = false)
     private int quantity;
 
-    @Column(name = "price" , nullable = false)
-    private double price;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("vendorProductId")
+    @JoinColumn(name = "vendor_product_id")
+    private VendorProduct vendorProduct;
 
-    @Column(name = "stock" , nullable = false)
-    private int stock;
-
-    @Column(name = "discount" , nullable = false)
-    private double discount;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
-    @MapsId("productId")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
+    @MapsId("productId")
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY , cascade = {CascadeType.PERSIST})

@@ -6,59 +6,47 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @AllArgsConstructor
 @Data
 @Builder
 @NoArgsConstructor
-public class AnonymousUserCartData {
+public class AnonymousUserCartData implements Serializable {
 
-    private double totalCartPrice;
 
     private List<CartItemDto> cartItems;
 
 
-    public void addToCartItems(CartItemDto cartItem){
-        this.totalCartPrice = cartItem.getQuantity() * cartItem.getPrice();
+    public void addToCartItems(CartItemDto cartItem ){
         cartItems.add(cartItem);
     }
 
-    public CartItemDto findCartItem(long productId){
+    public CartItemDto findCartItem(long productId , long vendorProductId){
         for (CartItemDto cartItem : cartItems){
-            if (cartItem.getProductId() == productId) return cartItem;
+            if (cartItem.getProductId() == productId && cartItem.getVendorProductId() == vendorProductId) return cartItem;
         }
         return null;
     }
 
-    public AnonymousUserCartData updateCartItemData(long productId , int quantity , double price){
+    public AnonymousUserCartData updateCartItemData(long productId , long vendorProductId , int quantity ){
         for (CartItemDto cartItem : cartItems){
-            if (cartItem.getProductId() == productId) {
+            if (cartItem.getProductId() == productId && cartItem.getVendorProductId() == vendorProductId) {
                 cartItem.setQuantity(quantity);
-                double oldTotalPricePerProduct = cartItem.getQuantity() * price;
-                double newTotalPricePerProduct = quantity * price;
-                totalCartPrice = totalCartPrice + (newTotalPricePerProduct - oldTotalPricePerProduct);
             };
         }
         return this;
     }
 
-    public AnonymousUserCartData removeFromCartItems(long productId){
-
-        cartItems.removeIf((cartItem) -> {
-            if(cartItem.getProductId() == productId){
-                totalCartPrice = totalCartPrice - (cartItem.getQuantity() * cartItem.getPrice());
-                return true;
-            }else return false;
-        });
-           return this;
+    public AnonymousUserCartData removeFromCartItems(long productId , long vendorProductId){
+        cartItems.removeIf((cartItem) -> cartItem.getProductId() == productId && cartItem.getVendorProductId() == vendorProductId);
+        return this;
     }
 
-    public CartItemDto getCartItem(long productId){
+    public CartItemDto getCartItem(long productId , long vendorProductId){
         for (CartItemDto cartItem : cartItems) {
-
-            if(cartItem.getProductId() == productId) return cartItem;
-
+            if(cartItem.getProductId() == productId && cartItem.getVendorProductId() == vendorProductId) return cartItem;
         }
         return null;
     }

@@ -13,7 +13,7 @@ public class CartItemQuantityDto {
 
     private int quantity;
 
-    private long vendorId;
+    private long vendorProductId;
 
     private long customerId;
 

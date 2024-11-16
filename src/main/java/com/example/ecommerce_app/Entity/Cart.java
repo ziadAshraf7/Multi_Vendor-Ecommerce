@@ -3,31 +3,31 @@ package com.example.ecommerce_app.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "cart")
 @AllArgsConstructor
 @Data
-@Builder
-@NoArgsConstructor
-public class Cart   {
+@SuperBuilder
 
-    @Id
-    @Column(name = "customer_id")
-    private long customerId;
+public class Cart  extends BaseEntity {
 
-    @Column(name = "total_price" , nullable = false)
-    private double totalPrice;
+    public Cart(){
+        super();
+    }
 
     @OneToMany(mappedBy = "cart", cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private List<CartItem> items;
 
-    @OneToOne(cascade = { CascadeType.PERSIST})
-    @MapsId
+    @ManyToOne(  fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private User customer;
 
@@ -36,18 +36,6 @@ public class Cart   {
 
     @Column(name = "updated_at" , insertable = false)
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
 
     public void addCartItems(CartItem cartItem){
         items.add(cartItem);
