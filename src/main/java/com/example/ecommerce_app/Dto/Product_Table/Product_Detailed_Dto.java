@@ -3,13 +3,10 @@ package com.example.ecommerce_app.Dto.Product_Table;
 import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.example.ecommerce_app.Dto.ProductAttributeValueTable.ProductAttributeValueDto;
 import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.Vendor_Product_Overview_Dto;
-import com.example.ecommerce_app.Entity.*;
-import jakarta.persistence.*;
+import com.example.ecommerce_app.Dto.Vendor_Product_Table.VendorProductOverviewDto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,13 +42,7 @@ public class Product_Detailed_Dto {
 
     private String description;
 
-//    private double price;
-//
-//    private double discount;
-//
-//    private int stock;
-
-    private List<Vendor_Product_Overview_Dto> vendor_products_dtos;
+    private List<VendorProductOverviewDto> vendor_products_dtos;
 
     private List<ProductReview_Detailed_Dto> reviewsDtos;
 

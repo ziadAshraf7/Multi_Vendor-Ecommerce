@@ -5,7 +5,6 @@ import com.example.ecommerce_app.Dto.Product_Table.*;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Exceptions.Exceptions.*;
 import com.example.ecommerce_app.Mapper.ProductMapper;
-import com.example.ecommerce_app.Repositery.Brand.BrandRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
@@ -13,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +29,13 @@ public class ProductServiceImp implements ProductService
 
   private final PageRequest pageable = PageRequest.of(0, 10);
 
+  private final ProductSpecification productSpecification;
 
   private BrandService brandService;
 
     @Override
     @Transactional
-    public Product_Overview_Dto updateProduct(Product_Update_Dto product_update_dto) {
+    public ProductOverviewDto updateProduct(Product_Update_Dto product_update_dto) {
         long productId = product_update_dto.getProductId();
 
         try {
@@ -46,7 +47,7 @@ public class ProductServiceImp implements ProductService
 
             productRepository.save(product);
 
-            return productMapper.to_Product_Overview_Dto(product);
+            return productMapper.toProductOverviewDto(product);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
             throw new DatabasePersistenceException("Unable to update Product with id " + product_update_dto.getProductId());
@@ -74,20 +75,20 @@ public class ProductServiceImp implements ProductService
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Product_Overview_Dto> getProductsByCategoryId(long categoryId) {
+    public Page<ProductOverviewDto> getProductsByCategoryId(long categoryId) {
 
         Category category = categoryService.getCategoryEntityById(categoryId);
 
         Page<Product> products = productRepository.findBySubCategory(category , pageable);
 
-        return products.map(productMapper::to_Product_Overview_Dto);
+        return products.map(productMapper::toProductOverviewDto);
      }
 
 
     @Override
     @Transactional(readOnly = true)
     public Product_Detailed_Dto getProductById(long productId) {
-           Product product = getProductEntityById(productId);
+           Product product = productRepository.getEagerProductEntity(productId);
            return productMapper.to_Product_Detailed_Dto(product);
     }
 
@@ -102,50 +103,41 @@ public class ProductServiceImp implements ProductService
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Product_Overview_Dto> getNewArrivalProducts(long categoryId) {
+    public Page<ProductOverviewDto> getNewArrivalProducts(long categoryId) {
             categoryService.getCategoryEntityById(categoryId);
             Page<Product> products = productRepository.getFeaturedProducts(categoryId , pageable);
-            return products.map(productMapper::to_Product_Overview_Dto);
+            return products.map(productMapper::toProductOverviewDto);
      }
 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Product_Overview_Dto> getDiscountProducts(long categoryId) {
+    public Page<ProductOverviewDto> getDiscountProducts(long categoryId) {
         categoryService.getCategoryEntityById(categoryId);
         Page<Product> products = productRepository.getDiscountProducts(categoryId , pageable);
-        return products.map(productMapper::to_Product_Overview_Dto);
+        return products.map(productMapper::toProductOverviewDto);
       }
 
      @Override
      @Transactional(readOnly = true)
-     public Page<Product_Overview_Dto> getBestSellerProductsPerBrand(long brandId) {
-         return null;
-     }
-
-     @Override
-     public Page<Product_Overview_Dto> getMostViewsProductsPerBrand(long brandId) {
-         return null;
-     }
-
-     @Override
-     public Page<Product_Overview_Dto> getMostViewsProductsPerCategory(long categoryId) {
+     public Page<ProductOverviewDto> getBestSellerProductsPerBrand(long brandId) {
          return null;
      }
 
 
      @Override
      @Transactional(readOnly = true)
-     public Page<Product_Overview_Dto> getBestSellerProductsPerCategory(long categoryId) {
+     public Page<ProductOverviewDto> getBestSellerProductsPerCategory(long categoryId) {
          return null;
      }
 
      @Override
      @Transactional(readOnly = true)
-
-     public Page<Product_Overview_Dto> filterProducts(ProductFilterDto productFilterDto) {
-         return null;
-     }
+     public Page<ProductOverviewDto> filterProducts(ProductFilterDto productFilterDto) {
+         Specification<Product> predicate = productSpecification.filterProducts(productFilterDto);
+         Page<Product> productPage = productRepository.findAll(predicate, pageable);
+         return productPage.map(productMapper::toProductOverviewDto);
+    }
 
      @Override
      @Transactional(readOnly = true)
@@ -155,13 +147,13 @@ public class ProductServiceImp implements ProductService
      }
 
      @Override
-     public Page<Product_Overview_Dto> getProductsPerBrand(long brandId) {
+     public Page<ProductOverviewDto> getProductsPerBrand(long brandId) {
 
             brandService.getBrandEntityById(brandId);
 
             Page<Product> products = productRepository.findByBrandId(brandId , pageable);
 
-            return products.map(productMapper::to_Product_Overview_Dto);
+            return products.map(productMapper::toProductOverviewDto);
 
           }
 

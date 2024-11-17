@@ -1,5 +1,4 @@
 package com.example.ecommerce_app.Dto.Product_Table;
-import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -46,7 +45,7 @@ public class Product_Creation_Dto implements Serializable {
     private String description;
 
     @JsonIgnore
-    @NotNull(message = "imageFiles cannot be null")
+//    @NotNull(message = "imageFiles cannot be null")
     @Size(max = 6 , min = 1 , message = "image Files cannot be greater than 6 or less than 1 image")
     List<MultipartFile> imageFiles;
 
@@ -62,6 +61,6 @@ public class Product_Creation_Dto implements Serializable {
     @NotNull(message = "discount cannot be null")
     private double discount;
 
-    @NotNull
-    Map<AttributeDto, List<String>> productAttributesWithValues;
+    @NotNull(message = "attributes cannot be empty")
+    Map<Long, List<String>> productAttributesWithValues;
 }

@@ -1,17 +1,18 @@
 package com.example.ecommerce_app.Mapper;
 
+import java.util.Base64;
 
 import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.example.ecommerce_app.Dto.ProductAttributeValueTable.ProductAttributeValueDto;
 import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Detailed_Dto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Overview_Dto;
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.Vendor_Product_Overview_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductOverviewDto;
+import com.example.ecommerce_app.Dto.Vendor_Product_Table.VendorProductOverviewDto;
 import com.example.ecommerce_app.Entity.*;
 import java.util.List;
 
-import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
+import com.example.ecommerce_app.Entity.Embedded_Ids.VendorProductEmbeddedId;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +22,9 @@ import java.util.*;
 
 @Mapper(
         componentModel = "spring" ,
-        imports = {Vendor_Product_Mapper.class , Vendor_Product.class , Vendor_Product_EmbeddedId.class , List.class}
+        imports = {Vendor_Product_Mapper.class ,
+                VendorProduct.class , VendorProductEmbeddedId.class , List.class
+        , Base64.class}
 )
 public interface ProductMapper {
 
@@ -30,29 +33,32 @@ public interface ProductMapper {
     ProductReview_Mapper PRODUCT_REVIEW_MAPPER = Mappers.getMapper(ProductReview_Mapper.class);
 
     @Mapping(target = "RatingCount" , ignore = true)
-    @Mapping(target = "thumbNail" , source = "thumbNail" , qualifiedByName = "mapToImage")
+    @Mapping(target = "thumbNail" , source = "thumbNail" , ignore = true , qualifiedByName = "mapToImage")
     @Mapping(target = "brand" , ignore = true )
     @Mapping(target = "subCategory" , ignore = true)
-    @Mapping(target = "vendor_products",  expression = "java(List.of(Vendor_Product.builder().id(new Vendor_Product_EmbeddedId()).build()))")
-    @Mapping(target = "images" , source = "imageFiles" , qualifiedByName = "mapFromImagesFilesToImages")
+    @Mapping(target = "vendor_products",  expression = "java(List.of(VendorProduct.builder().build()))")
+    @Mapping(target = "images" , source = "imageFiles" , ignore = true , qualifiedByName = "mapFromImagesFilesToImages")
     Product toEntity(Product_Creation_Dto product_creation_dto);
 
 
     @Mappings({
             @Mapping( target = "brand_name" , expression = "java(product.getBrandName())") ,
             @Mapping(target = "sub_category_name" , expression = "java(product.getSubCategoryName())") ,
-            @Mapping(source = "vendor_products" , target = "vendor_products_dtos" , qualifiedByName = "mapToVendorProductDto") ,
+            @Mapping(source = "vendor_products" , target = "vendorProductsDto" , qualifiedByName = "mapToVendorProductDto") ,
+            @Mapping( target =  "thumbNail"  , ignore = true, expression = "java(Base64.getEncoder().encodeToString(product.getThumbNail()))"),
+            @Mapping(target = "productId" , expression = "java(product.getId())")
     })
-    Product_Overview_Dto to_Product_Overview_Dto(Product product);
+    ProductOverviewDto toProductOverviewDto(Product product);
 
 
     @Mappings({
             @Mapping( target = "brand_name" , expression = "java(product.getBrandName())") ,
             @Mapping( target = "subCategoryName" , expression = "java(product.getSubCategoryName())") ,
             @Mapping(source = "vendor_products" , target = "vendor_products_dtos" , qualifiedByName = "mapToVendorProductDto") ,
-            @Mapping(source = "images" , target = "images" , qualifiedByName = "mapToImages") ,
+            @Mapping(source = "images" , target = "images" , ignore = true , qualifiedByName = "mapToImages") ,
             @Mapping(source = "reviews" , target = "reviewsDtos" , qualifiedByName = "mapTo_ProductReview_Detailed_Dto"),
-            @Mapping(source = "attributeValues" , target = "attributeDtoListMap" , qualifiedByName = "mapToAttributeValuesDetails")
+            @Mapping(source = "attributeValues" , target = "attributeDtoListMap" , qualifiedByName = "mapToAttributeValuesDetails"),
+            @Mapping(target = "thumbNail" , ignore = true)
     })
     Product_Detailed_Dto to_Product_Detailed_Dto(Product product);
 
@@ -74,7 +80,7 @@ public interface ProductMapper {
                     .build();
 
             map.compute(attributeDto , (key , value) -> {
-                if(value == null) return new ArrayList<>();
+                if(value == null) return new ArrayList<>(List.of(productAttributeValueDto));
                 value.add(productAttributeValueDto);
                 return value;
             });
@@ -117,10 +123,10 @@ public interface ProductMapper {
     }
 
     @Named("mapToVendorProductDto")
-    default List<Vendor_Product_Overview_Dto> mapToVendorProductDto(List<Vendor_Product> vendor_products){
-        List<Vendor_Product_Overview_Dto> vendor_product_overview_dtos = new ArrayList<>(vendor_products.size());
+    default List<VendorProductOverviewDto> mapToVendorProductDto(List<VendorProduct> vendor_products){
+        List<VendorProductOverviewDto> vendor_product_overview_dtos = new ArrayList<>(vendor_products.size());
 
-        for(Vendor_Product vendor_product : vendor_products){
+        for(VendorProduct vendor_product : vendor_products){
             vendor_product_overview_dtos.add(VENDOR_PRODUCT_MAPPER.to_Vendor_Product_Overview_Dto(vendor_product));
         }
         return vendor_product_overview_dtos;

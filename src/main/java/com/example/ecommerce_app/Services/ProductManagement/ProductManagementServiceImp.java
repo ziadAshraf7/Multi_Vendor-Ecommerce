@@ -1,18 +1,17 @@
-package com.example.ecommerce_app.Services.Product_Mangement;
+package com.example.ecommerce_app.Services.ProductManagement;
 
 
-import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
 import com.example.ecommerce_app.Entity.*;
-import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
-import com.example.ecommerce_app.Mapper.ProductMapper;
+import com.example.ecommerce_app.Repositery.Attribute.AttributeRepository;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.ProductAttributeValue.ProductAttributeValueRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product_Image.Vendor_Product_Image_Repository;
-import com.example.ecommerce_app.Repositery.Vendor_Product.Vendor_Product_Repository;
+import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
 import com.example.ecommerce_app.Services.User.UserServiceImp;
@@ -34,7 +33,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @Slf4j
-public class ProductManagementServiceImp implements Product_Management_Service{
+public class ProductManagementServiceImp implements ProductManagementService {
 
     private final BrandService brandService;
 
@@ -42,9 +41,7 @@ public class ProductManagementServiceImp implements Product_Management_Service{
 
     private final ProductRepository productRepository;
 
-    private final ProductMapper productMapper;
-
-    private final Vendor_Product_Repository vendor_product_repository;
+    private final VendorProductRepository vendor_product_repository;
 
     private final UserServiceImp userServiceImp;
 
@@ -54,31 +51,31 @@ public class ProductManagementServiceImp implements Product_Management_Service{
 
     private final ProductAttributeValueRepository productAttributeValueRepository;
 
+    private final AttributeRepository attributeRepository;
+
     @Override
     @Transactional
-    public void addProduct(Product_Creation_Dto product_creation_dto) {
+    public void addProduct(Product_Creation_Dto productCreationDto) throws IOException {
 
-        try {
-            Brand brandReference = brandService.getBrandEntityById(product_creation_dto.getBrandId());
+            Brand brandReference = brandService.getBrandEntityById(productCreationDto.getBrandId());
 
-            Category subCategoryReference = categoryService.getSubCategoryEntityById(product_creation_dto.getSubCategoryId());
+            Category subCategoryReference = categoryService.getSubCategoryEntityById(productCreationDto.getSubCategoryId());
 
-            User vendorReference = userServiceImp.getUserEntityById(product_creation_dto.getVendorId() , UserRoles.ROLE_VENDOR);
+            User vendorReference = userServiceImp.getUserEntityById(productCreationDto.getVendorId() , UserRoles.ROLE_VENDOR);
 
-            long productId = saveProductEntity(product_creation_dto , brandReference , subCategoryReference);
+            Product existingProduct = productRepository.findByName(productCreationDto.getName());
+
+            if(existingProduct != null) throw new CustomConflictException("product " + productCreationDto.getName() + " is already exists");
+
+            long productId = saveProductEntity(productCreationDto , brandReference , subCategoryReference);
 
             Product productReference = productRepository.getReferenceById(productId);
 
-            addAttributesWithValuesToProduct(product_creation_dto.getProductAttributesWithValues() , productReference);
+            addAttributesWithValuesToProduct(productCreationDto.getProductAttributesWithValues() , productReference);
 
-            saveVendorProductEntity(product_creation_dto , productReference , vendorReference);
+            saveVendorProductEntity(productCreationDto , productReference , vendorReference);
 
-            saveProductImages(product_creation_dto , productReference);
-
-        }catch (CustomRuntimeException | IOException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to add new Product");
-        }
+            saveProductImages(productCreationDto , productReference , vendorReference);
 
     }
 
@@ -91,7 +88,7 @@ public class ProductManagementServiceImp implements Product_Management_Service{
             Product product = productRepository.save(Product.builder()
                     .description(product_creation_dto.getDescription())
                     .brand(brandReference)
-                    .name(product_creation_dto.getName())
+                    .name(product_creation_dto.getName().toLowerCase())
                     .rating(product_creation_dto.getRating())
                     .subCategory(subCategoryReference)
                     .thumbNail(product_creation_dto.getThumbNail().getBytes())
@@ -106,20 +103,19 @@ public class ProductManagementServiceImp implements Product_Management_Service{
 
     @Transactional
     private void saveVendorProductEntity(
-            Product_Creation_Dto product_creation_dto ,
+            Product_Creation_Dto productCreationDto ,
             Product productReference ,
             User vendorReference
             ){
-        try {
-            Vendor_Product vendor_product = Vendor_Product.builder()
-                    .id(new Vendor_Product_EmbeddedId())
-                    .stock(product_creation_dto.getStock())
-                    .price(UtilsClass.calcProductFinalPrice(product_creation_dto.getPrice() , product_creation_dto.getDiscount()))
-                    .discount(product_creation_dto.getDiscount())
+            VendorProduct vendor_product = VendorProduct.builder()
+                    .stock(productCreationDto.getStock())
+                    .price(UtilsClass.calcProductFinalPrice(productCreationDto.getPrice() , productCreationDto.getDiscount()))
+                    .discount(productCreationDto.getDiscount())
                     .vendor(vendorReference)
                     .product(productReference)
                     .build();
 
+        try {
              vendor_product_repository.save(vendor_product);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
@@ -129,19 +125,21 @@ public class ProductManagementServiceImp implements Product_Management_Service{
     }
 
     @Transactional
-    private void saveProductImages(Product_Creation_Dto product_creation_dto ,
-                                   Product productReference
+    private void saveProductImages(Product_Creation_Dto productCreationDto ,
+                                   Product productReference ,
+                                   User vendor
                                    ) throws IOException {
-        try {
 
-            List<Vendor_Product_Image> vendor_product_imageList = new ArrayList<>(product_creation_dto.getImageFiles().size());
+            List<Vendor_Product_Image> vendor_product_imageList = new ArrayList<>(productCreationDto.getImageFiles().size());
 
-            for(MultipartFile imageFile : product_creation_dto.getImageFiles())
+            for(MultipartFile imageFile : productCreationDto.getImageFiles())
                 vendor_product_imageList.add( Vendor_Product_Image.builder()
+                        .vendor(vendor)
                         .product(productReference)
                         .image(imageFile.getBytes())
                         .build());
 
+        try {
             vendor_product_image_repository.saveAll(vendor_product_imageList);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
@@ -153,18 +151,21 @@ public class ProductManagementServiceImp implements Product_Management_Service{
 
     @Transactional
     private void addAttributesWithValuesToProduct(
-            Map<AttributeDto, List<String>> attrValues ,
+            Map<Long, List<String>> attrValues ,
             Product productReference
             ){
 
         List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
 
-        for(Map.Entry<AttributeDto , List<String>> entry : attrValues.entrySet()){
+        for(Map.Entry<Long , List<String>> entry : attrValues.entrySet()){
 
-            Attribute attribute = Attribute.builder()
-                    .name(entry.getKey().getName().toLowerCase())
-                    .id(entry.getKey().getAttributeId())
-                    .build();
+            Attribute attribute = attributeRepository.findById(entry.getKey())
+                    .orElseThrow(() -> new CustomNotFoundException("attribute is not found"));
+            System.out.println(attribute.getSubCategories().size());
+            System.out.println("size");
+
+            if(!attribute.getSubCategories().stream().map(Category::getId).toList()
+                    .contains(productReference.getSubCategory().getId())) throw new CustomConflictException("attribute is not part of product category");
 
             for(String value : entry.getValue()){
                 productAttributeValues.add(
@@ -178,14 +179,11 @@ public class ProductManagementServiceImp implements Product_Management_Service{
             }
         }
 
-
-
-
         try {
             productAttributeValueRepository.saveAll(productAttributeValues);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new DatabasePersistenceException("Database Error while persisting product attribute with value");
+            throw new DatabasePersistenceException("Attributes Entered are not Found");
         }
     }
 }
