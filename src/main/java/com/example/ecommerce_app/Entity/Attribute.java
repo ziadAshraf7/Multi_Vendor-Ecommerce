@@ -3,9 +3,9 @@ package com.example.ecommerce_app.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -13,6 +13,8 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Attribute {
 
     @Id
@@ -29,6 +31,11 @@ public class Attribute {
             joinColumns = { @JoinColumn(name = "attribute_id") },
             inverseJoinColumns = { @JoinColumn(name = "sub_category_id") }
     )
-    private final Set<Category> subCategories;
+    private  Set<Category> subCategories;
+
+    public void addNewSubCategory(Category category){
+        subCategories.add(category);
+        category.addAttribute(this);
+    }
 
 }

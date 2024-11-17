@@ -83,7 +83,7 @@ public class ProductAttributeValueServiceImp
 
     }
 
-
+    @Transactional(readOnly = true)
     @Override
     public Map<String , List<ProductAttributeValue>> getProductAttributeValues(long productId) {
         List<ProductAttributeValue> productAttributeValues = productAttributeValueRepository.findByProductId(productId);

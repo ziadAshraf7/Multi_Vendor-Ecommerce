@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface AttributeRepository extends JpaRepository<Attribute , Long> {
 
@@ -19,4 +21,6 @@ public interface AttributeRepository extends JpaRepository<Attribute , Long> {
     @Query("DELETE FROM Attribute a WHERE a.name = :name")
     void deleteEntityByName(@Param("name") String name);
 
+    @Query("SELECT a FROM Attribute a JOIN a.subCategories sc WHERE sc.id = :subCategoryId")
+    List<Attribute> findBySubCategoryId(@Param("subCategoryId") long categoryId);
 }

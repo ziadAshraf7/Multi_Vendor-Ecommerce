@@ -62,7 +62,7 @@ public class AuthenticationServiceImp implements AuthenticationService{
             Cookie cookie = new Cookie(AUTHORIZATION_HEADER, null);
             cookie.setMaxAge(0);
             return cookie;
-        }catch (RuntimeException e){
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Error While Logout User");
         }
