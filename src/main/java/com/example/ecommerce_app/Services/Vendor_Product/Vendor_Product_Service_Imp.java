@@ -1,14 +1,14 @@
 package com.example.ecommerce_app.Services.Vendor_Product;
 
 import com.example.ecommerce_app.Dto.Vendor_Product_Table.Vendor_Product_Creation_Dto;
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.Vendor_Product_Overview_Dto;
+import com.example.ecommerce_app.Dto.Vendor_Product_Table.VendorProductOverviewDto;
 import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.User;
-import com.example.ecommerce_app.Entity.Vendor_Product;
+import com.example.ecommerce_app.Entity.VendorProduct;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.Vendor_Product_Mapper;
-import com.example.ecommerce_app.Repositery.Vendor_Product.Vendor_Product_Repository;
+import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Product.ProductService;
 import com.example.ecommerce_app.Services.User.UserService;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
@@ -29,7 +29,7 @@ public class Vendor_Product_Service_Imp implements Vendor_Product_Service {
 
     private Vendor_Product_Mapper vendor_product_mapper;
 
-    private Vendor_Product_Repository vendor_product_repository;
+    private VendorProductRepository vendor_product_repository;
 
     private final ProductService productService;
 
@@ -37,13 +37,13 @@ public class Vendor_Product_Service_Imp implements Vendor_Product_Service {
 
     @Override
     @Transactional
-    public Vendor_Product_Overview_Dto link_vendor_with_product(Vendor_Product_Creation_Dto vendor_product_creation_dto)  {
+    public VendorProductOverviewDto link_vendor_with_product(Vendor_Product_Creation_Dto vendor_product_creation_dto)  {
 
         Product product = productService.getProductEntityById(vendor_product_creation_dto.getProductId());
 
         User vendor = userService.getUserEntityById(vendor_product_creation_dto.getVendorId() , UserRoles.ROLE_VENDOR);
 
-        Vendor_Product vendorProduct = vendor_product_mapper.toEntity(vendor_product_creation_dto );
+        VendorProduct vendorProduct = vendor_product_mapper.toEntity(vendor_product_creation_dto );
 
         vendorProduct.setProduct(product);
         vendorProduct.setVendor(vendor);
@@ -68,12 +68,10 @@ public class Vendor_Product_Service_Imp implements Vendor_Product_Service {
     }
 
     @Override
-    public Vendor_Product getByVendorIdAndProductId(long vendorId, long productId) {
-        try {
-            return vendor_product_repository.findByVendor_IdAndProduct_Id(productId , vendorId);
-        }catch (RuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomNotFoundException("can't retrieve product_vendor entity");
-        }
+    @Transactional(readOnly = true)
+    public VendorProduct getByVendorIdAndProductId(long vendorProductId) {
+            VendorProduct vendorProduct = vendor_product_repository.findByVendorIdAndProductId(vendorProductId);
+            if(vendorProduct == null) throw new CustomNotFoundException("vendorProduct entity cannot be found");
+            return  vendorProduct;
     }
 }

@@ -1,7 +1,6 @@
 package com.example.ecommerce_app.Entity;
 
 
-import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

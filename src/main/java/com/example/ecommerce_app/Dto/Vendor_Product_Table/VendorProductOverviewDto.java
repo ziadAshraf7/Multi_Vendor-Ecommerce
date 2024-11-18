@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Vendor_Product_Overview_Dto {
+public class VendorProductOverviewDto {
+
+  private long vendorProductId;
 
   private String vendorName;
 
