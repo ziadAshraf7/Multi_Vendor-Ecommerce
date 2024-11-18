@@ -43,13 +43,13 @@ public class CategoryServiceImp implements CategoryService {
 
     @Transactional
     public void addSubCategory(Sub_Category_Creation_Dto subCategoryCreationDto){
-        try {
             Category existingCategoryByName = getCategoryEntityByName(subCategoryCreationDto.getName());
             if(existingCategoryByName != null) throw new CustomConflictException("Category with name " + subCategoryCreationDto.getName() + " is already exists" );
 
             Category parentCategory = getParentCategoryEntityById(subCategoryCreationDto.getParentCategoryId());
             Category subCategory = categoryMapper.toSubCategoryEntity(subCategoryCreationDto);
             subCategory.setParentCategory(parentCategory);
+        try {
             categoryRepository.save(subCategory);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
@@ -84,13 +84,13 @@ public class CategoryServiceImp implements CategoryService {
     @Transactional
     public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
 
-        try {
             Category category = getCategoryEntityById(categoryUpdateDto.getCategoryId());
 
             if(categoryUpdateDto.getName() != null) category.setName(category.getName());
             if(categoryUpdateDto.getImage() != null) category.setImage(category.getImage());
             if(categoryUpdateDto.getDescription() != null) category.setDescription(category.getDescription());
 
+        try {
             categoryRepository.save(category);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
@@ -112,6 +112,21 @@ public class CategoryServiceImp implements CategoryService {
     public Category getCategoryEntityByName(String name) {
         return categoryRepository.findByName(name);
     }
+
+    @Transactional
+    @Override
+    public void deleteCategoryById(long categoryId) {
+        Category category = getCategoryEntityById(categoryId);
+
+        try {
+            categoryRepository.deleteById(categoryId);
+        }catch (DatabasePersistenceException e){
+            log.error(e.getMessage());
+            throw new DatabasePersistenceException("Database error while deleting category");
+        }
+
+    }
+
 
 
 }

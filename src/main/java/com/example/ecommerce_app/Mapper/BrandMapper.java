@@ -3,7 +3,7 @@ package com.example.ecommerce_app.Mapper;
 
 import com.example.ecommerce_app.Dto.Brand_Table.BrandCreationDto;
 import com.example.ecommerce_app.Dto.Brand_Table.BrandResponseDto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Overview_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductOverviewDto;
 import com.example.ecommerce_app.Entity.Brand;
 import com.example.ecommerce_app.Entity.Product;
 import org.mapstruct.*;
@@ -31,9 +31,9 @@ public interface BrandMapper {
 
 
  @Named("mapToProduct_overview_dtos")
- default List<Product_Overview_Dto> mapToProduct_overview_dtos(List<Product> products){
-     List<Product_Overview_Dto> product_overview_dtos = new ArrayList<>(products.size());
-     for(Product product : products) product_overview_dtos.add(PRODUCT_MAPPER.to_Product_Overview_Dto(product));
+ default List<ProductOverviewDto> mapToProduct_overview_dtos(List<Product> products){
+     List<ProductOverviewDto> product_overview_dtos = new ArrayList<>(products.size());
+     for(Product product : products) product_overview_dtos.add(PRODUCT_MAPPER.toProductOverviewDto(product));
     return product_overview_dtos;
  }
 

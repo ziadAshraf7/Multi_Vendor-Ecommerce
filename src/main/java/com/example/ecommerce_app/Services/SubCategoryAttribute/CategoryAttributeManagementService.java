@@ -1,9 +1,7 @@
-package com.example.ecommerce_app.Services.CategoryAttribute;
+package com.example.ecommerce_app.Services.SubCategoryAttribute;
 
 import com.example.ecommerce_app.Dto.CategoryAttributeManagement.SubCategoryAttributeResponseDto;
 import com.example.ecommerce_app.Dto.CategoryAttributeManagement.SubCategoryWithAttributeDto;
-
-import java.util.List;
 
 public interface CategoryAttributeManagementService {
 

@@ -22,4 +22,6 @@ public interface BrandService {
     void updateBrand(BrandUpdateDto brandUpdateDto) throws IOException;
 
     Brand getBrandEntityById(long brandId);
+
+    List<BrandResponseDto> getAllBrands();
 }

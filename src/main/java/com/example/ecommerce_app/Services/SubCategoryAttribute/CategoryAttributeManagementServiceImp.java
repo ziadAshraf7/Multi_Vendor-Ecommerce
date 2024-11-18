@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Services.CategoryAttribute;
+package com.example.ecommerce_app.Services.SubCategoryAttribute;
 
 import com.example.ecommerce_app.Dto.CategoryAttributeManagement.SubCategoryAttributeResponseDto;
 import com.example.ecommerce_app.Dto.CategoryAttributeManagement.SubCategoryWithAttributeDto;
@@ -16,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -32,20 +30,20 @@ public class CategoryAttributeManagementServiceImp implements CategoryAttributeM
 
     private final AttributeService attributeService;
 
+    private final AttributeRepository attributeRepository;
+
     @Transactional
     @Override
     public void linkBetweenSubCategoryAndAttribute(SubCategoryWithAttributeDto subCategoryWithAttributeDto) {
-
-        try {
 
             Category subCategory = categoryService.getSubCategoryEntityById(subCategoryWithAttributeDto.getSubCategoryId());
 
             Attribute attribute = attributeService.getAttributeEntityById(subCategoryWithAttributeDto.getAttributeId());
 
-            subCategory.addAttribute(attribute);
+            attribute.addNewSubCategory(subCategory);
 
-            categoryRepository.save(subCategory);
-
+        try {
+            attributeRepository.save(attribute);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
             throw new DatabaseInternalServerError("Database error while linking between attribute and sub_Category");
@@ -56,7 +54,6 @@ public class CategoryAttributeManagementServiceImp implements CategoryAttributeM
     @Transactional
     @Override
     public void unLinkSubCategoryAndAttribute(SubCategoryWithAttributeDto subCategoryWithAttributeDto) {
-        try {
 
             Category subCategory = categoryService.getSubCategoryEntityById(subCategoryWithAttributeDto.getSubCategoryId());
 
@@ -64,8 +61,8 @@ public class CategoryAttributeManagementServiceImp implements CategoryAttributeM
 
             subCategory.removeAttribute(attribute);
 
+        try {
             categoryRepository.save(subCategory);
-
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
             throw new DatabaseInternalServerError("Database error while linking between attribute and sub_Category");
@@ -73,6 +70,7 @@ public class CategoryAttributeManagementServiceImp implements CategoryAttributeM
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public SubCategoryAttributeResponseDto getSubCategoryAttributesNames(SubCategoryWithAttributeDto subCategoryWithAttributeDto) {
 

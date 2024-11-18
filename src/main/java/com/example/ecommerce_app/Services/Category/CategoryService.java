@@ -20,4 +20,6 @@ public interface CategoryService {
     Category getCategoryEntityById(long categoryId);
 
     Category getCategoryEntityByName(String name);
+
+    void deleteCategoryById(long categoryId);
 }

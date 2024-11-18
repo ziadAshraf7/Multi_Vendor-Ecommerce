@@ -10,7 +10,7 @@ import org.w3c.dom.Attr;
 
 import java.util.*;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true , onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "category")
 @Data
@@ -51,13 +51,8 @@ public class Category extends BaseEntity {
     @JsonIgnore
     private final List<Product> products = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
-    @JoinTable(
-            name = "sub_category_attributes",
-            joinColumns = { @JoinColumn(name = "sub_category_id") },
-            inverseJoinColumns = { @JoinColumn(name = "attribute_id") }
-    )
-    private  Set<Attribute> subCategoryAttributes ;
+    @ManyToMany(mappedBy = "subCategories", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private Set<Attribute> subCategoryAttributes;
 
 
     public void addSubCategory(Category category){

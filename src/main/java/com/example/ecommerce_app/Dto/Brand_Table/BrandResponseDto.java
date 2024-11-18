@@ -1,26 +1,27 @@
 package com.example.ecommerce_app.Dto.Brand_Table;
 
 
-import com.example.ecommerce_app.Dto.Product_Table.Product_Overview_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductOverviewDto;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @AllArgsConstructor
-public class BrandResponseDto extends BrandCreationDto {
+@NoArgsConstructor
+public class BrandResponseDto {
 
-    public BrandResponseDto(){
-        super();
-    }
+    List<ProductOverviewDto> product_overview_dtos;
 
-    @NotNull
-    List<Product_Overview_Dto> product_overview_dtos;
+    @NotEmpty(message = "brand name can't be empty")
+    private String name;
+
+    @NotNull(message = "image can't be null")
+    private byte[] image;
 
 }
