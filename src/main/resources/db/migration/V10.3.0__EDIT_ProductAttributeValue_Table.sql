@@ -1,8 +1,5 @@
 
 
-ALTER TABLE product_attribute_value
-DROP FOREIGN KEY FKq7f7hsmadimryte2lve68i42y;
-
  ALTER TABLE product_attribute_value
  Rename Column sub_category_attribute_id To attribute_id;
 

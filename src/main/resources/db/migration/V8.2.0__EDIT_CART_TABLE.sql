@@ -1,7 +1,0 @@
-
-
-ALTER TABLE cart
-DROP COLUMN id;
-
-ALTER TABLE cart
-ADD PRIMARY KEY (customer_id)

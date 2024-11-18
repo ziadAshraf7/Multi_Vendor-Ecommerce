@@ -1,5 +1,5 @@
 
-Alter table cart Drop FOREIGN KEY fk_cart_customer;
+Alter table cart Drop CONSTRAINT fk_cart_customer;
 ALTER TABLE cart DROP PRIMARY KEY;
 
 

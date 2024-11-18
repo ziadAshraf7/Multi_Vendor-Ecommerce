@@ -6,5 +6,5 @@ CREATE TABLE cart (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     customer_id BIGINT,
-    FOREIGN KEY (customer_id) REFERENCES user(id)
+    CONSTRAINT fk_cart_customer FOREIGN KEY (customer_id) REFERENCES user(id)
 );

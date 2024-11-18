@@ -99,8 +99,8 @@ CREATE TABLE Vendor_Product (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (product_id, vendor_id),
-    FOREIGN KEY (product_id) REFERENCES product(id),
-    FOREIGN KEY (vendor_id) REFERENCES user(id)
+    CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES product(id),
+    CONSTRAINT fk_vendor FOREIGN KEY (vendor_id) REFERENCES user(id)
 );
 
 CREATE TABLE vendor_product_image (

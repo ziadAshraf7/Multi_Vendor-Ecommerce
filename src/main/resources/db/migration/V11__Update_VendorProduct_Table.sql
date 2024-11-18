@@ -13,3 +13,13 @@ ON vendor_product (vendor_id , product_id ,  price , stock , discount , created_
 CREATE INDEX IDX_ProductId_VendorProduct
 ON vendor_product (product_id , vendor_id , price , stock , discount , created_at);
 
+
+ALTER TABLE Vendor_Product
+ADD CONSTRAINT fk_product
+FOREIGN KEY (product_id)
+REFERENCES product(id);
+
+ALTER TABLE Vendor_Product
+ADD CONSTRAINT fk_vendor
+FOREIGN KEY (vendor_id)
+REFERENCES user(id);
