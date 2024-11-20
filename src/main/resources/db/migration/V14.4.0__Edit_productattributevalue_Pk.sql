@@ -1,0 +1,2 @@
+ALTER TABLE product_attribute_value DROP PRIMARY KEY;
+ALTER TABLE product_attribute_value MODIFY COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
