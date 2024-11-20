@@ -87,7 +87,7 @@ public class CategoryServiceImp implements CategoryService {
             Category category = getCategoryEntityById(categoryUpdateDto.getCategoryId());
 
             if(categoryUpdateDto.getName() != null) category.setName(category.getName());
-            if(categoryUpdateDto.getImage() != null) category.setImage(category.getImage());
+            if(categoryUpdateDto.getImage() != null) category.setImageFileName(category.getImageFileName());
             if(categoryUpdateDto.getDescription() != null) category.setDescription(category.getDescription());
 
         try {

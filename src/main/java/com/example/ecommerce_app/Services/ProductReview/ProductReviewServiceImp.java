@@ -128,7 +128,7 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
         if(productReview_update_dto.getRate() != null) productReview.setRate(productReview_update_dto.getRate());
         if(productReview_update_dto.getDescription() != null) productReview.setDescription(productReview_update_dto.getDescription());
-        if(productReview_update_dto.getImage() != null) productReview.setImage(productReview_update_dto.getImage().getBytes());
+        if(productReview_update_dto.getImage() != null) productReview.setImageFileName(productReview_update_dto.getImage().getOriginalFilename());
 
         try {
             productReviewRepository.save(productReview);

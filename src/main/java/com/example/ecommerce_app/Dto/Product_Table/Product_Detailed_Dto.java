@@ -34,20 +34,20 @@ public class Product_Detailed_Dto {
     @Min(value = 0)
     private int rating;
 
-    private byte[] thumbNail;
+    private String thumbNail;
 
-    private String brand_name;
+    private String brandName;
 
     private String subCategoryName;
 
     private String description;
 
-    private List<VendorProductOverviewDto> vendor_products_dtos;
+    private List<VendorProductOverviewDto> vendorProductOverviewDtos;
 
     private List<ProductReview_Detailed_Dto> reviewsDtos;
 
     private Map<AttributeDto , List<ProductAttributeValueDto>> attributeDtoListMap;
 
-    private  List<byte[]> images;
+    private  List<String> imageFilesName;
 
 }

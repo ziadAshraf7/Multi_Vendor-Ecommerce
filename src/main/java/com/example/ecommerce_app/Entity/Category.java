@@ -28,9 +28,8 @@ public class Category extends BaseEntity {
     private String name;
 
 
-    @Lob
-    @Column(name = "image" , columnDefinition = "LONGBLOB" , nullable = false)
-    private byte[] image;
+    @Column(name = "image" , nullable = false)
+    private String imageFileName;
 
 
     @Column(name = "description" , columnDefinition = "TEXT",  nullable = false )

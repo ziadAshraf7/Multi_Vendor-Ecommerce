@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -23,8 +24,6 @@ public class ProductManagementForVendorsServiceImp implements ProductManagementF
     private final NotificationService notificationService;
 
     private final UserService userService;
-
-    private final RedisTemplate<String, Object> template;
 
     private final RedisNotificationMessagesManagementService redisNotificationMessagesManagementService;
 
@@ -41,11 +40,11 @@ public class ProductManagementForVendorsServiceImp implements ProductManagementF
                             .message("Vendor id " + productCreationDto.getVendorId() + " has requested to add a product")
                             .build();
 
-            redisNotificationMessagesManagementService.persistNotificationMessageAssociatedData(
-                    "admin@gmail.com" ,
+          redisNotificationMessagesManagementService.persistNotificationMessageAssociatedData(
+                    messageId ,
                     productCreationDto
             );
-
+            System.out.println("dddddddddddddddddddddddddddddddddddddddddd");
             notificationService.sendNotification(productCreationNotificationRequest);
 
         }catch (CustomRuntimeException e){

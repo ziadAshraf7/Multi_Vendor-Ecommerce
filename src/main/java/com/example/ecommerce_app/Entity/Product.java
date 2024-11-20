@@ -6,7 +6,6 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
 import java.util.*;
 
 @EqualsAndHashCode(callSuper = true)
@@ -46,8 +45,8 @@ public class Product extends BaseEntity {
     @Min(value = 0)
     private int rating;
 
-    @Column(name = "thumbnail" , columnDefinition = "LONGBLOB" , nullable = false)
-    private byte[] thumbNail;
+    @Column(name = "thumbnail"  , nullable = false)
+    private String thumbNail;
 
     @ManyToOne(cascade = {CascadeType.PERSIST , CascadeType.REMOVE} , fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
@@ -62,7 +61,7 @@ public class Product extends BaseEntity {
 
     @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
-    private List<Vendor_Product> vendor_products;
+    private List<VendorProduct> vendor_products;
 
 
     @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE} )
@@ -71,17 +70,14 @@ public class Product extends BaseEntity {
 
     @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
-    private  List<Vendor_Product_Image> images;
+    private  List<vendorProductImage> imageFilesName;
 
-
-    @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
-    List<CartItem> cartItems;
 
     @OneToMany(mappedBy = "product" ,  cascade = {CascadeType.PERSIST , CascadeType.REMOVE} )
     List<ProductAttributeValue> attributeValues;
 
-    public void addImage(List<Vendor_Product_Image> vendorProductImageList){
-        images.addAll(vendorProductImageList);
+    public void addImage(List<vendorProductImage> vendorProductImageList){
+        imageFilesName.addAll(vendorProductImageList);
     }
 
     public String getBrandName(){

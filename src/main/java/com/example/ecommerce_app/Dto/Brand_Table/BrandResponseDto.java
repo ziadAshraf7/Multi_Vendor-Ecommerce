@@ -22,6 +22,6 @@ public class BrandResponseDto {
     private String name;
 
     @NotNull(message = "image can't be null")
-    private byte[] image;
+    private String image;
 
 }

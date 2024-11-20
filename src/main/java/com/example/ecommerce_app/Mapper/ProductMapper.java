@@ -33,32 +33,29 @@ public interface ProductMapper {
     ProductReview_Mapper PRODUCT_REVIEW_MAPPER = Mappers.getMapper(ProductReview_Mapper.class);
 
     @Mapping(target = "RatingCount" , ignore = true)
-    @Mapping(target = "thumbNail" , source = "thumbNail" , ignore = true , qualifiedByName = "mapToImage")
+    @Mapping(target = "thumbNail"  , expression = "java(product_creation_dto.getThumbNail().getOriginalFilename())")
     @Mapping(target = "brand" , ignore = true )
     @Mapping(target = "subCategory" , ignore = true)
-    @Mapping(target = "vendor_products",  expression = "java(List.of(VendorProduct.builder().build()))")
-    @Mapping(target = "images" , source = "imageFiles" , ignore = true , qualifiedByName = "mapFromImagesFilesToImages")
+    @Mapping(target = "imageFilesName" , source = "imageFiles" , qualifiedByName = "mapFromImagesFilesToImages")
     Product toEntity(Product_Creation_Dto product_creation_dto);
 
 
     @Mappings({
-            @Mapping( target = "brand_name" , expression = "java(product.getBrandName())") ,
-            @Mapping(target = "sub_category_name" , expression = "java(product.getSubCategoryName())") ,
+            @Mapping( target = "brandName" , expression = "java(product.getBrandName())") ,
+            @Mapping(target = "subCategoryName" , expression = "java(product.getSubCategoryName())") ,
             @Mapping(source = "vendor_products" , target = "vendorProductsDto" , qualifiedByName = "mapToVendorProductDto") ,
-            @Mapping( target =  "thumbNail"  , ignore = true, expression = "java(Base64.getEncoder().encodeToString(product.getThumbNail()))"),
             @Mapping(target = "productId" , expression = "java(product.getId())")
     })
     ProductOverviewDto toProductOverviewDto(Product product);
 
 
     @Mappings({
-            @Mapping( target = "brand_name" , expression = "java(product.getBrandName())") ,
+            @Mapping( target = "brandName" , expression = "java(product.getBrandName())") ,
             @Mapping( target = "subCategoryName" , expression = "java(product.getSubCategoryName())") ,
-            @Mapping(source = "vendor_products" , target = "vendor_products_dtos" , qualifiedByName = "mapToVendorProductDto") ,
-            @Mapping(source = "images" , target = "images" , ignore = true , qualifiedByName = "mapToImages") ,
+            @Mapping(source = "vendor_products" , target = "vendorProductOverviewDtos" , qualifiedByName = "mapToVendorProductDto") ,
+            @Mapping(source = "imageFilesName" , target = "imageFilesName"  , qualifiedByName = "mapToImages") ,
             @Mapping(source = "reviews" , target = "reviewsDtos" , qualifiedByName = "mapTo_ProductReview_Detailed_Dto"),
             @Mapping(source = "attributeValues" , target = "attributeDtoListMap" , qualifiedByName = "mapToAttributeValuesDetails"),
-            @Mapping(target = "thumbNail" , ignore = true)
     })
     Product_Detailed_Dto to_Product_Detailed_Dto(Product product);
 
@@ -98,26 +95,26 @@ public interface ProductMapper {
 
 
     @Named("mapToImage")
-    default byte[] mapToImage(MultipartFile image) throws IOException { return image.getBytes();};
+    default String mapToImage(MultipartFile image) { return image.getOriginalFilename();};
 
 
     @Named("mapToImages")
-    default List<byte[]> mapToImages(List<Vendor_Product_Image> images){
-        List<byte[]> imageFiles = new ArrayList<>(images.size());
+    default List<String> mapToImages(List<vendorProductImage> images){
+        List<String> imageFiles = new ArrayList<>(images.size());
 
-        for(Vendor_Product_Image vendor_product_image : images){
-            imageFiles.add(vendor_product_image.getImage());
+        for(vendorProductImage vendor_product_image : images){
+            imageFiles.add(vendor_product_image.getImageFileName());
         }
         return imageFiles;
     }
 
     @Named("mapFromImagesFilesToImages")
-    default List<Vendor_Product_Image> mapFromImagesFilesToImages(List<MultipartFile> imageFiles) throws IOException {
+    default List<vendorProductImage> mapFromImagesFilesToImages(List<MultipartFile> imageFiles) throws IOException {
 
-        List<Vendor_Product_Image> images = new ArrayList<>(imageFiles.size());
+        List<vendorProductImage> images = new ArrayList<>(imageFiles.size());
 
         for(MultipartFile image : imageFiles){
-            images.add(Vendor_Product_Image.builder().image(image.getBytes()).build());
+            images.add(vendorProductImage.builder().imageFileName(image.getOriginalFilename()).build());
         }
         return images;
     }

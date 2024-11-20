@@ -45,7 +45,7 @@ public class Product_Creation_Dto implements Serializable {
     private String description;
 
     @JsonIgnore
-//    @NotNull(message = "imageFiles cannot be null")
+    @NotNull(message = "imageFiles cannot be null")
     @Size(max = 6 , min = 1 , message = "image Files cannot be greater than 6 or less than 1 image")
     List<MultipartFile> imageFiles;
 

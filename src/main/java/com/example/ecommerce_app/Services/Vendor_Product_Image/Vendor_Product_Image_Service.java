@@ -11,7 +11,7 @@ public interface Vendor_Product_Image_Service  {
 
     void removeProductImage(long imageId);
 
-    List<byte[]> getVendorProductImages(long vendorId , long productId);
+    List<String> getVendorProductImages(long vendorId , long productId);
 
 
     void removeAllImagesPerVendorProduct(long vendorId , long productId);

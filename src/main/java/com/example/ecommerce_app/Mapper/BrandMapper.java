@@ -22,7 +22,7 @@ public interface BrandMapper {
 
        ProductMapper PRODUCT_MAPPER = Mappers.getMapper(ProductMapper.class);
 
-       @Mapping(source = "image" , target = "image" , qualifiedByName = "mapMultipartFileToBytes")
+       @Mapping( target = "imageFileName" , expression = "java(brandCreationDto.getImage().getOriginalFilename())")
        Brand fromCreationDtoToEntity(BrandCreationDto brandCreationDto);
 
 
@@ -37,12 +37,5 @@ public interface BrandMapper {
     return product_overview_dtos;
  }
 
- @Named("mapMultipartFileToBytes")
-    default byte[] mapMultipartFileToBytes(MultipartFile image) throws IOException {
-        if (image == null || image.isEmpty()) {
-            return null; // or handle as needed
-        }
-        return image.getBytes();
-}
 
 }

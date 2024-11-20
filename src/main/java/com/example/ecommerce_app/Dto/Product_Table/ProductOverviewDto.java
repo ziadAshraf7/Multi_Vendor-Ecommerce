@@ -20,9 +20,9 @@ public class ProductOverviewDto {
 
     private int rating;
 
-    private String brand_name;
+    private String brandName;
 
-    private String sub_category_name;
+    private String subCategoryName;
 
     private String thumbNail;
 

@@ -32,9 +32,8 @@ public class ProductReview  {
     @NotEmpty
     private String description;
 
-    @Lob
-    @Column(name = "image" , columnDefinition = "LONGBLOB")
-    private byte[] image;
+    @Column(name = "image" )
+    private String imageFileName;
 
     @ManyToOne(fetch = FetchType.LAZY , cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "customer_id")

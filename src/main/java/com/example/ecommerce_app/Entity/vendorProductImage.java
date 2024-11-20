@@ -13,15 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Vendor_Product_Image {
+public class vendorProductImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Lob
-    @Column(name = "image" , columnDefinition = "LONGBLOB" , nullable = false)
-    private byte[] image;
+    @Column(name = "image" , nullable = false)
+    private String imageFileName;
 
     @ManyToOne(fetch = FetchType.LAZY , cascade = { CascadeType.PERSIST})
     @JoinColumn(name = "product_id")

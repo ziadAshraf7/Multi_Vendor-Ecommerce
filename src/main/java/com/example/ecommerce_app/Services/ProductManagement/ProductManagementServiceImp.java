@@ -10,7 +10,7 @@ import com.example.ecommerce_app.Repositery.Attribute.AttributeRepository;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.ProductAttributeValue.ProductAttributeValueRepository;
-import com.example.ecommerce_app.Repositery.Vendor_Product_Image.Vendor_Product_Image_Repository;
+import com.example.ecommerce_app.Repositery.Vendor_Product_Image.vendorProductImageRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
@@ -45,7 +45,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
 
     private final UserServiceImp userServiceImp;
 
-    private final Vendor_Product_Image_Repository vendor_product_image_repository;
+    private final vendorProductImageRepository vendor_product_image_repository;
 
     private final CategoryService categoryService;
 
@@ -91,7 +91,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
                     .name(product_creation_dto.getName().toLowerCase())
                     .rating(product_creation_dto.getRating())
                     .subCategory(subCategoryReference)
-                    .thumbNail(product_creation_dto.getThumbNail().getBytes())
+                    .thumbNail(product_creation_dto.getThumbNail().getOriginalFilename())
                     .title(product_creation_dto.getTitle())
                     .build());
 
@@ -130,13 +130,13 @@ public class ProductManagementServiceImp implements ProductManagementService {
                                    User vendor
                                    ) throws IOException {
 
-            List<Vendor_Product_Image> vendor_product_imageList = new ArrayList<>(productCreationDto.getImageFiles().size());
+            List<vendorProductImage> vendor_product_imageList = new ArrayList<>(productCreationDto.getImageFiles().size());
 
             for(MultipartFile imageFile : productCreationDto.getImageFiles())
-                vendor_product_imageList.add( Vendor_Product_Image.builder()
+                vendor_product_imageList.add( vendorProductImage.builder()
                         .vendor(vendor)
                         .product(productReference)
-                        .image(imageFile.getBytes())
+                        .imageFileName(imageFile.getOriginalFilename())
                         .build());
 
         try {
@@ -161,8 +161,6 @@ public class ProductManagementServiceImp implements ProductManagementService {
 
             Attribute attribute = attributeRepository.findById(entry.getKey())
                     .orElseThrow(() -> new CustomNotFoundException("attribute is not found"));
-            System.out.println(attribute.getSubCategories().size());
-            System.out.println("size");
 
             if(!attribute.getSubCategories().stream().map(Category::getId).toList()
                     .contains(productReference.getSubCategory().getId())) throw new CustomConflictException("attribute is not part of product category");

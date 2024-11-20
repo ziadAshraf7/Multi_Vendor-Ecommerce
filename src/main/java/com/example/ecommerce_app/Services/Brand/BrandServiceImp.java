@@ -73,7 +73,7 @@ public class BrandServiceImp implements BrandService {
     public void updateBrand(BrandUpdateDto brandUpdateDto) throws IOException {
             Brand brand = getBrandEntityById(brandUpdateDto.getBrandId());
             if(brandUpdateDto.getName() != null) brand.setName(brandUpdateDto.getName());
-            if (brandUpdateDto.getImage() != null) brand.setImage(brandUpdateDto.getImage().getBytes());
+            if (brandUpdateDto.getImage() != null) brand.setImageFileName(brandUpdateDto.getImage().getOriginalFilename());
         try {
             brandRepository.save(brand);
         }catch (DatabasePersistenceException e){
@@ -101,7 +101,7 @@ public class BrandServiceImp implements BrandService {
                 BrandResponseDto
                         .builder()
                         .name(brand.getName())
-                        .image(brand.getImage())
+                        .image(brand.getImageFileName())
                         .build()
         ));
 

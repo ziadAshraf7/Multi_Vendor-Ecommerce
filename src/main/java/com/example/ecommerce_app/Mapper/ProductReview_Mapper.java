@@ -18,13 +18,13 @@ import java.io.IOException;
 )
 public interface ProductReview_Mapper {
 
-    @Mapping(target = "image"  , source = "image")
+    @Mapping(target = "imageFileName"  , expression = "java(productReview_creation_dto.getImage().getOriginalFilename())")
     @Mapping(target = "user" , ignore = true)
     @Mapping(target = "product" , ignore = true)
     @Mapping(target = "id" , expression = "java(new Product_Review_EmbeddedId())")
     ProductReview fromCreationDtoToEntity(ProductReview_Creation_Dto productReview_creation_dto);
 
-    @Mapping(target = "image"  , source = "image")
+    @Mapping(target = "imageFileName"  , expression = "java(productReview_update_dto.getImage().getOriginalFilename())")
     @Mapping(target = "user" , ignore = true)
     @Mapping(target = "product" , ignore = true)
     @Mapping(target = "id" , expression = "java(new Product_Review_EmbeddedId())")
@@ -35,7 +35,5 @@ public interface ProductReview_Mapper {
     @Mapping(target = "productName" , expression = ("java(productReview.getProduct().getName())"))
     ProductReview_Detailed_Dto to_ProductReview_Detailed_Dto(ProductReview productReview);
 
-    default byte[] mapToImage(MultipartFile image) throws IOException {
-        return image.getBytes();
-    }
+
 }

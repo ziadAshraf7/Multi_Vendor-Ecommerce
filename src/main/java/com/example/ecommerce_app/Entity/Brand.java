@@ -35,7 +35,7 @@ public class Brand  {
 
     @NotNull(message = "image cannot be null")
     @Column(name = "image" , nullable = false)
-    private byte[] image;
+    private String imageFileName;
 
     @OneToMany(mappedBy = "brand" ,cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore

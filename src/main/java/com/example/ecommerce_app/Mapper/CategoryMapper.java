@@ -14,24 +14,18 @@ public interface CategoryMapper {
 
    @Mappings({
            @Mapping(target = "parentCategory" , ignore = true) ,
-           @Mapping(source = "image", target = "image", qualifiedByName = "mapMultipartFileToBytes")
+           @Mapping( target = "imageFileName", expression = "java(subCategoryCreationDto.getImage().getOriginalFilename())")
    })
    Category toSubCategoryEntity(Sub_Category_Creation_Dto subCategoryCreationDto );
 
 
    @Mappings({
-           @Mapping(source = "image", target = "image", qualifiedByName = "mapMultipartFileToBytes")
+           @Mapping( target = "imageFileName" , expression = "java(parentCategoryCreationDto.getImage().getOriginalFilename())")
    })
    Category toParentCategoryEntity(Parent_Category_Creation_Dto parentCategoryCreationDto);
 
 
 
-   @Named("mapMultipartFileToBytes")
-   default byte[] mapMultipartFileToBytes(MultipartFile image) throws IOException {
-      if (image == null || image.isEmpty()) {
-         return null; // or handle as needed
-      }
-      return image.getBytes();
-   }
+
 
 }
