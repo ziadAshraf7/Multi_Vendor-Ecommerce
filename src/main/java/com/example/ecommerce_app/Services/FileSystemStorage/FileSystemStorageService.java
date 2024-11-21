@@ -1,5 +1,6 @@
 package com.example.ecommerce_app.Services.FileSystemStorage;
 
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,15 @@ public class FileSystemStorageService {
 
     public Path retrieveImagePath(String imageFileName) throws IOException {
         return rootLocation.resolve(imageFileName).normalize();
+    }
+
+    public void deleteImageFile(String fileName) {
+        try {
+            Path filePath = rootLocation.resolve(fileName);
+            Files.delete(filePath);
+        } catch (IOException e) {
+            throw new CustomRuntimeException(e.getMessage());
+        }
     }
 
     public boolean isImageFileExists(String fileName){

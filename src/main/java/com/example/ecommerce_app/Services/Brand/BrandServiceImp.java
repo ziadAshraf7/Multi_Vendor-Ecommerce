@@ -7,6 +7,7 @@ import com.example.ecommerce_app.Entity.Brand;
 import com.example.ecommerce_app.Exceptions.Exceptions.*;
 import com.example.ecommerce_app.Mapper.BrandMapper;
 import com.example.ecommerce_app.Repositery.Brand.BrandRepository;
+import com.example.ecommerce_app.Services.FileSystemStorage.FileSystemStorageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,14 +26,18 @@ public class BrandServiceImp implements BrandService {
 
     private final BrandMapper brandMapper;
 
+    private final FileSystemStorageService fileSystemStorageService;
+
     @Transactional
-    public void addBrand(BrandCreationDto brandCreationDto){
+    public void addBrand(BrandCreationDto brandCreationDto) throws IOException {
         Brand brand = brandRepository.findByName(brandCreationDto.getName());
 
         if(brand != null) throw new CustomConflictException("brand name " + brandCreationDto.getName() + " is already exists");
 
         Brand newBrand = brandMapper.fromCreationDtoToEntity(brandCreationDto);
-
+        newBrand.setImageFileName(fileSystemStorageService.saveImageToFileSystem(
+                brandCreationDto.getImage()
+        ));
         try {
             brandRepository.save(newBrand);
         }catch (DatabasePersistenceException e){
@@ -60,8 +65,9 @@ public class BrandServiceImp implements BrandService {
     @Transactional
     public void deleteBrandById(long brandId) {
         try {
-            getBrandEntityById(brandId);
-            brandRepository.deleteById(brandId);
+            Brand brand = getBrandEntityById(brandId);
+            fileSystemStorageService.deleteImageFile(brand.getImageFileName());
+            brandRepository.deleteById(brand.getId());
         }catch (DatabaseInternalServerError e){
             log.error(e.getMessage());
             throw new DatabaseInternalServerError("unable to delete the brand with id " + brandId);
@@ -73,7 +79,10 @@ public class BrandServiceImp implements BrandService {
     public void updateBrand(BrandUpdateDto brandUpdateDto) throws IOException {
             Brand brand = getBrandEntityById(brandUpdateDto.getBrandId());
             if(brandUpdateDto.getName() != null) brand.setName(brandUpdateDto.getName());
-            if (brandUpdateDto.getImage() != null) brand.setImageFileName(brandUpdateDto.getImage().getOriginalFilename());
+            if (brandUpdateDto.getImage() != null) {
+                fileSystemStorageService.deleteImageFile(brand.getImageFileName());
+                brand.setImageFileName(fileSystemStorageService.saveImageToFileSystem(brandUpdateDto.getImage()));
+            };
         try {
             brandRepository.save(brand);
         }catch (DatabasePersistenceException e){

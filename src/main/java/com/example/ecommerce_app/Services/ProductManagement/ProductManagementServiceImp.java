@@ -14,6 +14,7 @@ import com.example.ecommerce_app.Repositery.Vendor_Product_Image.vendorProductIm
 import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
+import com.example.ecommerce_app.Services.FileSystemStorage.FileSystemStorageService;
 import com.example.ecommerce_app.Services.User.UserServiceImp;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 import com.example.ecommerce_app.Utills.UtilsClass;
@@ -52,6 +53,8 @@ public class ProductManagementServiceImp implements ProductManagementService {
     private final ProductAttributeValueRepository productAttributeValueRepository;
 
     private final AttributeRepository attributeRepository;
+
+    private final FileSystemStorageService fileSystemStorageService;
 
     @Override
     @Transactional
@@ -132,12 +135,15 @@ public class ProductManagementServiceImp implements ProductManagementService {
 
             List<vendorProductImage> vendor_product_imageList = new ArrayList<>(productCreationDto.getImageFiles().size());
 
-            for(MultipartFile imageFile : productCreationDto.getImageFiles())
+            for(MultipartFile imageFile : productCreationDto.getImageFiles()){
+                String imageFileName = fileSystemStorageService.saveImageToFileSystem(imageFile);
                 vendor_product_imageList.add( vendorProductImage.builder()
                         .vendor(vendor)
                         .product(productReference)
-                        .imageFileName(imageFile.getOriginalFilename())
+                        .imageFileName(imageFileName)
                         .build());
+            }
+
 
         try {
             vendor_product_image_repository.saveAll(vendor_product_imageList);

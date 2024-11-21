@@ -8,6 +8,7 @@ import com.example.ecommerce_app.Mapper.ProductMapper;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
+import com.example.ecommerce_app.Services.FileSystemStorage.FileSystemStorageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
 
 @Service
 @AllArgsConstructor
@@ -33,24 +36,34 @@ public class ProductServiceImp implements ProductService
 
   private BrandService brandService;
 
+  private final FileSystemStorageService fileSystemStorageService;
+
     @Override
     @Transactional
-    public ProductOverviewDto updateProduct(Product_Update_Dto product_update_dto) {
-        long productId = product_update_dto.getProductId();
+    public ProductOverviewDto updateProduct(ProductUpdateDto productUpdateDto) {
+        long productId = productUpdateDto.getProductId();
 
         try {
             Product product = getProductEntityById(productId);
 
-            if((product_update_dto.getName() != null)) product.setName(product_update_dto.getName());
-            if((product_update_dto.getTitle() != null)) product.setTitle(product_update_dto.getTitle());
-            if(product_update_dto.getUserRate() != null) updateProductRating(product_update_dto.getUserRate() , product);
+            if((productUpdateDto.getName() != null)) product.setName(productUpdateDto.getName());
+            if((productUpdateDto.getTitle() != null)) product.setTitle(productUpdateDto.getTitle());
+            if(productUpdateDto.getUserRate() != null) updateProductRating(productUpdateDto.getUserRate() , product);
+            if(productUpdateDto.getThumbNail() != null){
+                fileSystemStorageService.deleteImageFile(product.getThumbNail());
+                product.setThumbNail(fileSystemStorageService.saveImageToFileSystem(
+                        productUpdateDto.getThumbNail()
+                ));
+            }
 
             productRepository.save(product);
 
             return productMapper.toProductOverviewDto(product);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new DatabasePersistenceException("Unable to update Product with id " + product_update_dto.getProductId());
+            throw new DatabasePersistenceException("Unable to update Product with id " + productUpdateDto.getProductId());
+        } catch (IOException e) {
+            throw new CustomRuntimeException(e.getMessage());
         }
 
     }
@@ -161,8 +174,9 @@ public class ProductServiceImp implements ProductService
      @Transactional
      public void removeProduct(long productId) {
         try {
-            getProductEntityById(productId);
-            productRepository.deleteById(productId);
+            Product product = getProductEntityById(productId);
+            fileSystemStorageService.deleteImageFile(product.getThumbNail());
+            productRepository.deleteById(product.getId());
         }catch (DatabaseInternalServerError e){
             log.error(e.getMessage());
             throw new DatabaseInternalServerError("Unable to delete product id " + productId);

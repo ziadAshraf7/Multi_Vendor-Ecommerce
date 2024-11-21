@@ -6,12 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Product_Update_Dto {
+public class ProductUpdateDto {
 
     @NotNull(message = "id cannot be null")
     private long productId;
@@ -22,4 +23,5 @@ public class Product_Update_Dto {
 
     private Integer userRate;
 
+    private MultipartFile thumbNail;
  }

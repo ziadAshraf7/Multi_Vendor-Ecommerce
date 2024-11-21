@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface BrandService {
 
-    void addBrand(BrandCreationDto brandCreationDto);
+    void addBrand(BrandCreationDto brandCreationDto) throws IOException;
 
     BrandResponseDto getBrandById(long brandId);
 
