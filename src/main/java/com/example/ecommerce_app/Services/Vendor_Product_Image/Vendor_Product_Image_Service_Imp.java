@@ -7,6 +7,7 @@ import com.example.ecommerce_app.Entity.vendorProductImage;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Mapper.VendorProductImageMapper;
 import com.example.ecommerce_app.Repositery.Vendor_Product_Image.vendorProductImageRepository;
+import com.example.ecommerce_app.Services.FileSystemStorage.FileSystemStorageService;
 import com.example.ecommerce_app.Services.Product.ProductService;
 import com.example.ecommerce_app.Services.User.UserService;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +32,11 @@ public class Vendor_Product_Image_Service_Imp implements Vendor_Product_Image_Se
 
     private final UserService userServiceImp;
 
-    private final VendorProductImageMapper vendor_product_image_mapper;
+    private final VendorProductImageMapper vendorProductImageMapper;
 
-    private final vendorProductImageRepository vendor_product_image_repository;
+    private final vendorProductImageRepository vendorProductImageRepository;
 
+    private final FileSystemStorageService fileSystemStorageService;
 
     @Override
     @Transactional
@@ -45,11 +48,29 @@ public class Vendor_Product_Image_Service_Imp implements Vendor_Product_Image_Se
         Product product = productService.getProductEntityById(productId);
         User vendor = userServiceImp.getUserEntityById(vendorId , UserRoles.ROLE_VENDOR);
 
-        List<vendorProductImage> images = vendor_product_image_mapper.toEntity(vendor_product_image_dto.getImageFiles(), product, vendor);
+        List<vendorProductImage> images = new ArrayList<>(vendor_product_image_dto.getImageFiles().size());
+
+
+
+        vendor_product_image_dto.getImageFiles().forEach(imageFile -> {
+            try {
+                String imageFileName =  fileSystemStorageService.saveImageToFileSystem(imageFile);
+
+                images.add(vendorProductImage.
+                        builder()
+                                .vendor(vendor)
+                                .product(product)
+                                .imageFileName(imageFileName)
+                        .build());
+
+            } catch (IOException e) {
+                throw new CustomRuntimeException(e.getMessage());
+            }
+        });
 
         try {
-            vendor_product_image_repository.saveAll(images);
-        }catch (RuntimeException e){
+            vendorProductImageRepository.saveAll(images);
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("unable to add images to the product id " + productId);
         }
@@ -61,8 +82,8 @@ public class Vendor_Product_Image_Service_Imp implements Vendor_Product_Image_Se
     @Transactional
     public void removeProductImage(long imageId) {
         try {
-            vendor_product_image_repository.deleteById(imageId);
-        }catch (RuntimeException e){
+            vendorProductImageRepository.deleteById(imageId);
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("unable to remove image");
         }
@@ -72,7 +93,7 @@ public class Vendor_Product_Image_Service_Imp implements Vendor_Product_Image_Se
     @Transactional(readOnly = true)
     public List<String> getVendorProductImages(long vendorId, long productId) {
         try {
-            List<vendorProductImage> vendor_product_images = vendor_product_image_repository.getAllImagesPerVendorProduct(vendorId , productId);
+            List<vendorProductImage> vendor_product_images = vendorProductImageRepository.getAllImagesPerVendorProduct(vendorId , productId);
 
             List<String> images = new ArrayList<>(vendor_product_images.size());
 
@@ -92,7 +113,7 @@ public class Vendor_Product_Image_Service_Imp implements Vendor_Product_Image_Se
     @Transactional
     public void removeAllImagesPerVendorProduct(long vendorId, long productId) {
         try {
-            vendor_product_image_repository.removeAllImagesPerVendorProduct(vendorId , productId);
+            vendorProductImageRepository.removeAllImagesPerVendorProduct(vendorId , productId);
         }catch (RuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("unable to remove images");

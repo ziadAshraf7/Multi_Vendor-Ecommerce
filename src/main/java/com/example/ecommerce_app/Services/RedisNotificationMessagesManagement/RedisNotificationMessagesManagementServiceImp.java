@@ -12,14 +12,13 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class RedisNotificationMessagesManagementServiceImp
 implements RedisNotificationMessagesManagementService
 {
     private  RedisTemplate<String, Object> template = new RedisTemplate<>();
 
-    private static String redisNotificationMessageDataKey = "notificationsMessageData";
+    private static String redisNotificationMessageDataKey = "notificationsMessageAssociatedData:1000";
 
     @Override
     public void persistNotificationMessage(String userEmail , NotificationData message) {
