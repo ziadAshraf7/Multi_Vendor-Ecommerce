@@ -11,7 +11,7 @@ public class OrderItemResponseDto {
 
     private String productName;
 
-    private byte[] productThumbnail;
+    private String productThumbnail;
 
     private double price;
 

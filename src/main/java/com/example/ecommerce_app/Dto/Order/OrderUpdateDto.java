@@ -1,6 +1,6 @@
 package com.example.ecommerce_app.Dto.Order;
 
-import com.example.ecommerce_app.Entity.Enums.OrderStatus;
+import com.example.ecommerce_app.Entity.Enums.OrderItemStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +14,6 @@ public class OrderUpdateDto {
 
     private Double totalAmount;
 
-    private OrderStatus orderStatus;
+    private OrderItemStatus orderItemStatus;
 
 }

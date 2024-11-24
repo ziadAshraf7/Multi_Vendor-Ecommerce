@@ -2,7 +2,6 @@ package com.example.ecommerce_app.Services.Order;
 
 import com.example.ecommerce_app.Dto.Order.OrderResponseDto;
 import com.example.ecommerce_app.Dto.Order.OrderUpdateDto;
-import com.example.ecommerce_app.Entity.Enums.OrderStatus;
 
 public interface OrderService {
 

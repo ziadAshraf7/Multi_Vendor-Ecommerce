@@ -1,6 +1,6 @@
 package com.example.ecommerce_app.Entity.Enums;
 
-public enum OrderStatus {
+public enum OrderItemStatus {
 
     PENDING ,
     DELIVERED ,

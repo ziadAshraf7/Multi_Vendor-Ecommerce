@@ -2,17 +2,17 @@ package com.example.ecommerce_app.Services.Order;
 
 import com.example.ecommerce_app.Dto.Order.OrderResponseDto;
 import com.example.ecommerce_app.Dto.Order.OrderUpdateDto;
-import com.example.ecommerce_app.Entity.Enums.OrderStatus;
 import com.example.ecommerce_app.Entity.Order;
 import com.example.ecommerce_app.Entity.User;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
+import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Repositery.Order.OrderRepository;
 import com.example.ecommerce_app.Services.User.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Data
@@ -24,22 +24,28 @@ public class OrderServiceImp implements OrderService {
 
     private final UserService userService;
 
+    @Transactional
     @Override
     public void createOrder(long customerId) {
 
           User customer = userService.getUserEntityById(customerId);
 
-          Order order = Order
+          Order newOrder = Order
                   .builder()
                   .customer(customer)
                   .totalAmount(0.0)
-                  .status(OrderStatus.PENDING)
                   .build();
+          try {
+              orderRepository.save(newOrder);
 
-          orderRepository.save(order);
+          }catch (DatabasePersistenceException e){
+              log.error(e.getMessage());
+              throw new DatabasePersistenceException("Database error while creating order");
+          }
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public OrderResponseDto getOrderData(long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(
@@ -49,21 +55,22 @@ public class OrderServiceImp implements OrderService {
         return OrderResponseDto
                 .builder()
                 .customerName(order.getCustomer().getUserName())
-                .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
                 .build();
     }
 
+    @Transactional
     @Override
     public void removeOrder(long orderId) {
         try {
             orderRepository.deleteById(orderId);
-        }catch (RuntimeException e){
+        }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to delete order id " + orderId);
+            throw new DatabasePersistenceException("Unable to delete order id " + orderId);
         }
     }
 
+    @Transactional
     @Override
     public void updateOrder(OrderUpdateDto orderUpdateDto) {
 
@@ -72,12 +79,13 @@ public class OrderServiceImp implements OrderService {
 
         Double newTotalAmount = orderUpdateDto.getTotalAmount();
 
-        OrderStatus orderStatus = orderUpdateDto.getOrderStatus();
-
         if(newTotalAmount != null) order.setTotalAmount(newTotalAmount);
 
-        if(orderStatus != null) order.setStatus(orderStatus);
-
-        orderRepository.save(order);
+        try {
+            orderRepository.save(order);
+        }catch (DatabasePersistenceException e){
+            log.error(e.getMessage());
+            throw new DatabasePersistenceException("Database Error while Updating order");
+        }
     }
 }

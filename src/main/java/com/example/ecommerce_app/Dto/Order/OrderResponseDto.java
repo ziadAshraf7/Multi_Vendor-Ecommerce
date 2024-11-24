@@ -1,8 +1,6 @@
 package com.example.ecommerce_app.Dto.Order;
 
-import com.example.ecommerce_app.Entity.Enums.OrderStatus;
-import com.example.ecommerce_app.Entity.User;
-import jakarta.persistence.*;
+import com.example.ecommerce_app.Entity.Enums.OrderItemStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +12,7 @@ public class OrderResponseDto {
 
     private String customerName;
 
-    private OrderStatus status ;
+    private OrderItemStatus status ;
 
     private double totalAmount ;
 
