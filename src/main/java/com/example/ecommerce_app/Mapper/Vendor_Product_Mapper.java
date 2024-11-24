@@ -1,8 +1,8 @@
 package com.example.ecommerce_app.Mapper;
 
 
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.VendorProductOverviewDto;
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.Vendor_Product_Creation_Dto;
+import com.example.ecommerce_app.Dto.VendorProductTable.VendorProductOverviewDto;
+import com.example.ecommerce_app.Dto.VendorProductTable.VendorProductCreationDto;
 import com.example.ecommerce_app.Entity.Embedded_Ids.VendorProductEmbeddedId;
 import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.User;
@@ -25,13 +25,13 @@ public interface Vendor_Product_Mapper {
       @Mapping(target = "product" , ignore = true)
       @Mapping(target = "vendor"  , ignore = true)
       VendorProduct toEntity(
-              Vendor_Product_Creation_Dto vendor_product_creation_dto
+              VendorProductCreationDto vendor_product_creation_dto
 
       );
 
       @Mapping( target = "vendorName" , expression = ("java(vendor_product.getVendor().getUserName())"))
       @Mapping(target = "vendorProductId" , source = "id")
-      VendorProductOverviewDto to_Vendor_Product_Overview_Dto(VendorProduct vendor_product);
+      VendorProductOverviewDto toVendorProductOverviewDto(VendorProduct vendor_product);
 
 
 }

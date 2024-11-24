@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Dto.Vendor_Product_Table;
+package com.example.ecommerce_app.Dto.VendorProductTable;
 
 
 import jakarta.validation.constraints.*;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class Vendor_Product_Creation_Dto {
+public class VendorProductCreationDto {
 
     @NotNull(message = "user id cannot be null")
     private long vendorId;
