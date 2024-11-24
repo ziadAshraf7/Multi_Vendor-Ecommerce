@@ -1,0 +1,4 @@
+
+
+ALTER TABLE order_item
+ADD status ENUM('PENDING', 'SHIPPED', 'DELIVERED' , 'CANCELLED') NOT NULL DEFAULT 'pending';

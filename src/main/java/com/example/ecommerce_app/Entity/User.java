@@ -7,9 +7,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 import java.util.*;
 
@@ -52,13 +53,13 @@ public class User extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "vendor" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
-    private List<Vendor_Product> vendor_products;
+    private List<VendorProduct> vendor_products;
 
     @OneToMany(mappedBy = "user" ,cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private final List<ProductReview> productReviews = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "customer", cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
-    private Cart cart;
+    @OneToMany( fetch = FetchType.LAZY, mappedBy = "customer", cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
+    private List<Cart> cart;
 
     @OneToMany(mappedBy = "customer", cascade = {CascadeType.REMOVE , CascadeType.PERSIST})
     private List<Order> order;

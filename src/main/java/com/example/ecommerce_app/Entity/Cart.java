@@ -17,7 +17,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @SuperBuilder
-
 public class Cart  extends BaseEntity {
 
     public Cart(){
@@ -27,18 +26,11 @@ public class Cart  extends BaseEntity {
     @OneToMany(mappedBy = "cart", cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     private List<CartItem> items;
 
-    @ManyToOne(  fetch = FetchType.LAZY)
+    @ManyToOne( fetch = FetchType.LAZY , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JoinColumn(name = "customer_id")
     private User customer;
-
-    @Column(name = "created_at" , updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at" , insertable = false)
-    private LocalDateTime updatedAt;
 
     public void addCartItems(CartItem cartItem){
         items.add(cartItem);
     }
-
 }
