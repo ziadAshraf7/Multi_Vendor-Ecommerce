@@ -2,8 +2,8 @@ package com.example.ecommerce_app.Dto.Product_Table;
 
 import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.example.ecommerce_app.Dto.ProductAttributeValueTable.ProductAttributeValueDto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.VendorProductOverviewDto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Detailed_Dto;
+import com.example.ecommerce_app.Dto.VendorProductTable.VendorProductOverviewDto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -19,7 +19,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Product_Detailed_Dto {
+public class ProductDetailedDto {
 
     @NotEmpty
     private String name;

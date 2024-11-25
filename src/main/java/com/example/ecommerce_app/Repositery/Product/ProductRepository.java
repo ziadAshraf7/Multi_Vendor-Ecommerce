@@ -38,6 +38,8 @@ public interface ProductRepository extends JpaRepository<Product ,Long > , JpaSp
     Page<Product> findAll(Specification<Product> productSpecification, Pageable pageable);
 
     @Query("SELECT p from Product p LEFT JOIN p.subCategory c LEFT JOIN p.vendor_products  LEFT JOIN p.brand  WHERE p.id = :productId")
-    @EntityGraph(attributePaths = {"vendor_products" , "vendor_products.vendor", "brand" , "subCategory" })
+    @EntityGraph(attributePaths = {"vendor_products" , "vendor_products.vendor", "brand" , "subCategory"})
     Product getEagerProductEntity(long productId);
+
+    boolean existsByName(String name);
 }

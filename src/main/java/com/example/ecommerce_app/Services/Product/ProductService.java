@@ -1,8 +1,8 @@
 package com.example.ecommerce_app.Services.Product;
 
+import com.example.ecommerce_app.Dto.Product_Table.ProductDetailedDto;
 import com.example.ecommerce_app.Dto.Product_Table.ProductFilterDto;
 import com.example.ecommerce_app.Dto.Product_Table.ProductOverviewDto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Detailed_Dto;
 import com.example.ecommerce_app.Dto.Product_Table.ProductUpdateDto;
 import com.example.ecommerce_app.Entity.Product;
 import org.springframework.data.domain.Page;
@@ -11,9 +11,9 @@ public interface ProductService {
 
      void removeProduct(long productId);
 
-     Product_Detailed_Dto getProductById(long productId);
+     ProductDetailedDto getProductById(long productId);
 
-     Product_Detailed_Dto getProductByName(String name);
+     ProductDetailedDto getProductByName(String name);
 
      ProductOverviewDto updateProduct(ProductUpdateDto product_update_dto);
 

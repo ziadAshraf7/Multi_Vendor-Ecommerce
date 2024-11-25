@@ -15,7 +15,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @Builder
-public class Product_Creation_Dto implements Serializable {
+public class ProductCreationDto implements Serializable {
 
     @NotNull(message = "id can't be null")
     private long vendorId;

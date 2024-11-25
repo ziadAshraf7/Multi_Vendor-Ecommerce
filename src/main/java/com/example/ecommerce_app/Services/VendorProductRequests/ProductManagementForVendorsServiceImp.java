@@ -1,6 +1,6 @@
 package com.example.ecommerce_app.Services.VendorProductRequests;
 
-import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductCreationDto;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Services.NotificationService.DataModel.NotificationData;
 import com.example.ecommerce_app.Services.NotificationService.Services.NotificationService;
@@ -9,10 +9,8 @@ import com.example.ecommerce_app.Services.User.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -29,7 +27,7 @@ public class ProductManagementForVendorsServiceImp implements ProductManagementF
 
 
     @Override
-    public void sendProductCreationRequestToAdmin(Product_Creation_Dto productCreationDto) {
+    public void sendProductCreationRequestToAdmin(ProductCreationDto productCreationDto) {
         try {
             String messageId = UUID.randomUUID().toString();
             NotificationData productCreationNotificationRequest = NotificationData

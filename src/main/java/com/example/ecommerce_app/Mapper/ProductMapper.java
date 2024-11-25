@@ -4,11 +4,11 @@ import java.util.Base64;
 
 import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
 import com.example.ecommerce_app.Dto.ProductAttributeValueTable.ProductAttributeValueDto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Detailed_Dto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Detailed_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductCreationDto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductDetailedDto;
 import com.example.ecommerce_app.Dto.Product_Table.ProductOverviewDto;
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.VendorProductOverviewDto;
+import com.example.ecommerce_app.Dto.VendorProductTable.VendorProductOverviewDto;
 import com.example.ecommerce_app.Entity.*;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public interface ProductMapper {
     @Mapping(target = "brand" , ignore = true )
     @Mapping(target = "subCategory" , ignore = true)
     @Mapping(target = "imageFilesName" , source = "imageFiles" , qualifiedByName = "mapFromImagesFilesToImages")
-    Product toEntity(Product_Creation_Dto product_creation_dto);
+    Product toEntity(ProductCreationDto product_creation_dto);
 
 
     @Mappings({
@@ -57,7 +57,7 @@ public interface ProductMapper {
             @Mapping(source = "reviews" , target = "reviewsDtos" , qualifiedByName = "mapTo_ProductReview_Detailed_Dto"),
             @Mapping(source = "attributeValues" , target = "attributeDtoListMap" , qualifiedByName = "mapToAttributeValuesDetails"),
     })
-    Product_Detailed_Dto to_Product_Detailed_Dto(Product product);
+    ProductDetailedDto to_Product_Detailed_Dto(Product product);
 
     @Named("mapToAttributeValuesDetails")
     default Map<AttributeDto, List<ProductAttributeValueDto>>  mapToAttributeValuesDetails(
@@ -124,7 +124,7 @@ public interface ProductMapper {
         List<VendorProductOverviewDto> vendor_product_overview_dtos = new ArrayList<>(vendor_products.size());
 
         for(VendorProduct vendor_product : vendor_products){
-            vendor_product_overview_dtos.add(VENDOR_PRODUCT_MAPPER.to_Vendor_Product_Overview_Dto(vendor_product));
+            vendor_product_overview_dtos.add(VENDOR_PRODUCT_MAPPER.toVendorProductOverviewDto(vendor_product));
         }
         return vendor_product_overview_dtos;
     }

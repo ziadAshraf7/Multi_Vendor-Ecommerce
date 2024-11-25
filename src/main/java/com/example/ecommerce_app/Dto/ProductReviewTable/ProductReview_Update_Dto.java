@@ -1,11 +1,8 @@
-package com.example.ecommerce_app.Dto.ProductReview_Table;
+package com.example.ecommerce_app.Dto.ProductReviewTable;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

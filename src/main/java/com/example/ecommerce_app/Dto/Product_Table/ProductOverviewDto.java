@@ -1,6 +1,6 @@
 package com.example.ecommerce_app.Dto.Product_Table;
 
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.VendorProductOverviewDto;
+import com.example.ecommerce_app.Dto.VendorProductTable.VendorProductOverviewDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

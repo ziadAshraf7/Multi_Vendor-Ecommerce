@@ -35,4 +35,7 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview , P
     @Transactional
     @Query(value = "delete from product_review pr where pr.product_id = :productId AND pr.customer_id = :userId " , nativeQuery = true)
     void deleteProductReview(@Param("productId") long productId ,@Param("userId") long userId);
+
+    @Query("SELECT COUNT(pr) FROM ProductReview pr WHERE pr.user.id = :userId AND pr.product.id = :productId")
+    int getReviewsCountPerUser(@Param("productId") long productId , @Param("userId") long userId);
 }

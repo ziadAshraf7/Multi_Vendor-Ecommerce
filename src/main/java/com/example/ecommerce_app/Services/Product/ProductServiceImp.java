@@ -100,14 +100,14 @@ public class ProductServiceImp implements ProductService
 
     @Override
     @Transactional(readOnly = true)
-    public Product_Detailed_Dto getProductById(long productId) {
+    public ProductDetailedDto getProductById(long productId) {
            Product product = productRepository.getEagerProductEntity(productId);
            return productMapper.to_Product_Detailed_Dto(product);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Product_Detailed_Dto getProductByName(String name) {
+    public ProductDetailedDto getProductByName(String name) {
             Product product = productRepository.findByName(name);
             if(product == null) throw new CustomNotFoundException("Unable to find product name " + name);
             return productMapper.to_Product_Detailed_Dto(product);

@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Dto.ProductReview_Table;
+package com.example.ecommerce_app.Dto.ProductReviewTable;
 
 
 import lombok.AllArgsConstructor;

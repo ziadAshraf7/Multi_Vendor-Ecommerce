@@ -1,14 +1,16 @@
 package com.example.ecommerce_app.Services.ProductReview;
 
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Creation_Dto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Update_Dto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReviewCreationDto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Detailed_Dto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Update_Dto;
 import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.ProductReview;
 import com.example.ecommerce_app.Entity.User;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.ProductReview_Mapper;
+import com.example.ecommerce_app.Projections.User.UserGeneralInfoInfoView;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.ProductReview.ProductReviewRepository;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
@@ -38,9 +40,6 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
     private final UserRepository userRepository;
 
-    private final ProductService productService;
-
-    private final UserService userService;
 
     @Override
     @Transactional(readOnly = true)
@@ -81,13 +80,25 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
     @Override
     @Transactional
-    public void addReview(ProductReview_Creation_Dto productReview_creation_dto) {
+    public void addReview(ProductReviewCreationDto productReviewCreationDto) {
 
-        Product product = productService.getProductEntityById(productReview_creation_dto.getProductId());
+        if(productReviewRepository.getReviewsCountPerUser(
+                productReviewCreationDto.getProductId() ,
+                productReviewCreationDto.getUserId()
+        ) > 0) throw new CustomBadRequestException("User cannot have multiple reviews per product ");
 
-        User user = userService.getUserEntityById(productReview_creation_dto.getUserId());
+        boolean isProductExists = productRepository.existsById(productReviewCreationDto.getProductId());
 
-        ProductReview productReview = productReviewMapper.fromCreationDtoToEntity(productReview_creation_dto);
+        if(!isProductExists) throw new CustomNotFoundException("Product is not found");
+
+        Product product = productRepository.getReferenceById(productReviewCreationDto.getProductId());
+
+        boolean isUserExists = userRepository.existsById(productReviewCreationDto.getUserId());
+        if(!isUserExists) throw new CustomNotFoundException("User is not Found");
+        User user = userRepository.getReferenceById(productReviewCreationDto.getUserId());
+
+        ProductReview productReview = productReviewMapper.fromCreationDtoToEntity(productReviewCreationDto);
+
 
         productReview.setProduct(product);
         productReview.setUser(user);

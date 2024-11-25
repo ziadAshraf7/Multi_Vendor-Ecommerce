@@ -1,8 +1,6 @@
-package com.example.ecommerce_app.Dto.ProductReview_Table;
+package com.example.ecommerce_app.Dto.ProductReviewTable;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
@@ -17,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductReview_Creation_Dto {
+public class ProductReviewCreationDto {
 
     @NotNull(message = "product id cannot be null")
     private long productId;
@@ -34,7 +32,6 @@ public class ProductReview_Creation_Dto {
     @NotNull(message = "description cannot be null")
     private String description;
 
-    @NotNull(message = "image cannot be null")
     private MultipartFile image;
 
 }

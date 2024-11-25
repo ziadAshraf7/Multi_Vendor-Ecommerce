@@ -1,15 +1,20 @@
 package com.example.ecommerce_app.Services.ProductManagement;
 
 
-import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductCreationDto;
 import com.example.ecommerce_app.Entity.*;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
+import com.example.ecommerce_app.Projections.Category.CategoryIdsGeneralInfoView;
+import com.example.ecommerce_app.Projections.User.UserGeneralInfoInfoView;
 import com.example.ecommerce_app.Repositery.Attribute.AttributeRepository;
+import com.example.ecommerce_app.Repositery.Brand.BrandRepository;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.ProductAttributeValue.ProductAttributeValueRepository;
+import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product_Image.vendorProductImageRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
@@ -29,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Data
@@ -38,11 +44,9 @@ public class ProductManagementServiceImp implements ProductManagementService {
 
     private final BrandService brandService;
 
-    private final CategoryRepository categoryRepository;
-
     private final ProductRepository productRepository;
 
-    private final VendorProductRepository vendor_product_repository;
+    private final VendorProductRepository vendorProductRepository;
 
     private final UserServiceImp userServiceImp;
 
@@ -56,19 +60,39 @@ public class ProductManagementServiceImp implements ProductManagementService {
 
     private final FileSystemStorageService fileSystemStorageService;
 
+//    ------------------------------------------------
+
+    private final BrandRepository brandRepository;
+    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
+
     @Override
     @Transactional
-    public void addProduct(Product_Creation_Dto productCreationDto) throws IOException {
+    public void addProduct(ProductCreationDto productCreationDto) throws IOException {
 
-            Brand brandReference = brandService.getBrandEntityById(productCreationDto.getBrandId());
+            Brand brandReference = brandRepository.getReferenceById(productCreationDto.getBrandId());
+            if(!brandRepository.existsById(productCreationDto.getBrandId())) throw new CustomNotFoundException("brand is not found");
 
-            Category subCategoryReference = categoryService.getSubCategoryEntityById(productCreationDto.getSubCategoryId());
+            CategoryIdsGeneralInfoView subCategoryGeneralInfoEntity = categoryRepository.findGeneralInfo(
+                    productCreationDto.getSubCategoryId()
+            );
 
-            User vendorReference = userServiceImp.getUserEntityById(productCreationDto.getVendorId() , UserRoles.ROLE_VENDOR);
+            if(subCategoryGeneralInfoEntity == null) throw new CustomNotFoundException("category is not found");
+            if(subCategoryGeneralInfoEntity.getParentCategoryId() <= 0) throw new CustomBadRequestException("category is parent category");
+            Category subCategoryReference = categoryRepository.getReferenceById(productCreationDto.getSubCategoryId());
 
-            Product existingProduct = productRepository.findByName(productCreationDto.getName());
+            UserGeneralInfoInfoView vendorGeneralInfoEntity = userRepository.findGeneralInfo(productCreationDto.getVendorId());
 
-            if(existingProduct != null) throw new CustomConflictException("product " + productCreationDto.getName() + " is already exists");
+            if(vendorGeneralInfoEntity == null ) throw new CustomNotFoundException("user vendor is not found");
+
+            if(!Objects.equals(vendorGeneralInfoEntity.getUserRole(), UserRoles.ROLE_VENDOR))
+                throw new CustomBadRequestException("User trying to add the product is not a vendor");
+
+            User vendorReference = userRepository.getReferenceById(productCreationDto.getVendorId());
+
+            boolean existingProductByName = productRepository.existsByName(productCreationDto.getName());
+
+            if(existingProductByName) throw new CustomConflictException("product " + productCreationDto.getName() + " is already exists");
 
             long productId = saveProductEntity(productCreationDto , brandReference , subCategoryReference);
 
@@ -83,10 +107,10 @@ public class ProductManagementServiceImp implements ProductManagementService {
     }
 
     @Transactional
-    private long saveProductEntity(Product_Creation_Dto product_creation_dto ,
+    private long saveProductEntity(ProductCreationDto product_creation_dto ,
                                    Brand brandReference ,
                                    Category subCategoryReference
-                                   ) throws IOException {
+                                   )  {
 
             Product product = productRepository.save(Product.builder()
                     .description(product_creation_dto.getDescription())
@@ -106,7 +130,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
 
     @Transactional
     private void saveVendorProductEntity(
-            Product_Creation_Dto productCreationDto ,
+            ProductCreationDto productCreationDto ,
             Product productReference ,
             User vendorReference
             ){
@@ -119,7 +143,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
                     .build();
 
         try {
-             vendor_product_repository.save(vendor_product);
+             vendorProductRepository.save(vendor_product);
         }catch (DatabasePersistenceException e){
             log.error(e.getMessage());
             throw new DatabasePersistenceException("Unable to link the product with the vendor");
@@ -128,7 +152,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
     }
 
     @Transactional
-    private void saveProductImages(Product_Creation_Dto productCreationDto ,
+    private void saveProductImages(ProductCreationDto productCreationDto ,
                                    Product productReference ,
                                    User vendor
                                    ) throws IOException {

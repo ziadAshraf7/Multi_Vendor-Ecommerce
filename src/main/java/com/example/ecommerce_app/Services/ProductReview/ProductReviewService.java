@@ -1,8 +1,8 @@
 package com.example.ecommerce_app.Services.ProductReview;
 
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Creation_Dto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Detailed_Dto;
-import com.example.ecommerce_app.Dto.ProductReview_Table.ProductReview_Update_Dto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReviewCreationDto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Detailed_Dto;
+import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Update_Dto;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,7 +13,7 @@ public interface ProductReviewService {
 
     List<ProductReview_Detailed_Dto> getAllReviewsPerUser(long UserId);
 
-    void addReview(ProductReview_Creation_Dto productReview_creation_dto);
+    void addReview(ProductReviewCreationDto productReview_creation_dto);
 
     void removeReview(long userId , long productId);
 
