@@ -4,15 +4,14 @@ package com.example.ecommerce_app.Services.User;
 import com.example.ecommerce_app.Dto.User.UserCreationDto;
 import com.example.ecommerce_app.Dto.User.UserInfoDetails;
 import com.example.ecommerce_app.Entity.User;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
-import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
+import com.example.ecommerce_app.Exceptions.Exceptions.*;
 import com.example.ecommerce_app.Mapper.UserMapper;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +85,7 @@ public class UserServiceImp implements UserService {
     public User addCustomerUser(UserCreationDto userCreationDto) {
             User existingUserWithPhoneNumber =  getUserByPhoneNumber(userCreationDto.getPhoneNumber());
             User existingUserWithEmail = getUserEntityByEmail(userCreationDto.getEmail());
+
             if(existingUserWithEmail != null) throw new CustomConflictException("Email is Already exists");
             if(existingUserWithPhoneNumber != null) throw new CustomConflictException("Phone Number is Already exists");
 
@@ -102,6 +102,7 @@ public class UserServiceImp implements UserService {
 
     }
 
+    @Transactional(readOnly = true)
     public User getUserEntityById(long userId , UserRoles userRole){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomNotFoundException("user is not found for user id " + userId));
@@ -109,24 +110,30 @@ public class UserServiceImp implements UserService {
         return user;
    }
 
+    @Transactional(readOnly = true)
     @Override
     public User getUserEntityById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomNotFoundException("user is not found for user id " + userId));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserInfoDetails getUserByEmail(String Email) {
+
+         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
           User user = userRepository.findByEmail(Email);
-          if(user == null) throw new CustomNotFoundException("Cannot find Email " + Email);
+        if(user == null) throw new CustomNotFoundException("Cannot find Email " + Email);
+        if(user.getUserRole() != UserRoles.ROLE_ADMIN || user.getEmail() != authentication.getPrincipal() )
+              throw new CustomBadRequestException("User is not authorized");
           return userMapper.toUserInfoDetails(user);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User getUserEntityByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        if(user == null) throw new CustomNotFoundException("Cannot find Email " + email);
-        return user;
+        return userRepository.findByEmail(email);
     }
 
 }

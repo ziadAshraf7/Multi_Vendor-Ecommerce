@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Redis.Session.Filter;
+package com.example.ecommerce_app.Filters;
 
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Redis.Session.SessionManagement.SessionService;

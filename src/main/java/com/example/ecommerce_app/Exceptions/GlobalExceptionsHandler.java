@@ -17,7 +17,12 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionsHandler {
 
-
+    @ExceptionHandler(CustomConflictException.class)
+    public ResponseEntity<ErrorResponse> handleCustomConflictException(CustomConflictException ex) {
+        return new ResponseEntity<>(
+                new ErrorResponse(ex.getMessage() , HttpStatus.CONFLICT.value()) , HttpStatus.CONFLICT
+        );
+    }
 
     @ExceptionHandler(CustomBadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(CustomBadRequestException ex) {

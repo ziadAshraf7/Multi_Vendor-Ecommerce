@@ -1,4 +1,4 @@
-package com.example.ecommerce_app.Dto.Vendor_Product_Table;
+package com.example.ecommerce_app.Dto.VendorProductTable;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

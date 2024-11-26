@@ -1,6 +1,6 @@
 package com.example.ecommerce_app.Services.Vendor_Product_Image;
 
-import com.example.ecommerce_app.Dto.Vendor_Product_Table.Vendor_Product_Image_Dto;
+import com.example.ecommerce_app.Dto.VendorProductTable.Vendor_Product_Image_Dto;
 import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Entity.vendorProductImage;
@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 @Service
 @Slf4j
-public class Vendor_Product_Image_Service_Imp implements Vendor_Product_Image_Service {
+public class VendorProductImageServiceImp implements VendorProductImageService {
 
 
     private final ProductService productService;
