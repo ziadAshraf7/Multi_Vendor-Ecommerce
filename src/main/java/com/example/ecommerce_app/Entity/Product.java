@@ -59,6 +59,12 @@ public class Product extends BaseEntity {
     @Column(name = "description" , columnDefinition = "TEXT" , nullable = false)
     private String description;
 
+    @Column(name = "sales_count" , columnDefinition = "default 0")
+    private int salesCount;
+
+    @Column(name = "views_count" , columnDefinition = "default 0")
+    private int viewsCount;
+
     @OneToMany(mappedBy = "product" , cascade = {CascadeType.PERSIST , CascadeType.REMOVE})
     @JsonIgnore
     private List<VendorProduct> vendor_products;

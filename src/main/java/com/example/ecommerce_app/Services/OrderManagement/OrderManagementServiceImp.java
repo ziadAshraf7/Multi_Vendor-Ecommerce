@@ -69,11 +69,13 @@ public class OrderManagementServiceImp implements OrderManagementService {
         vendorProductList.sort(Comparator.comparing(vendorProduct -> vendorProduct.getProduct().getId()));
 
         List<OrderItem> orderItemList = new ArrayList<>(products.size());
-
+        List<Product> updatedProductSales = new ArrayList<>(products.size());
         for(int i = 0 ; i< products.size() ; i++){
             VendorProduct vendorProduct = vendorProductList.get(i);
             vendorProduct.setStock(vendorProduct.getStock() - 1);
             Product product = products.get(i);
+            product.setSalesCount(product.getSalesCount() + 1);
+            updatedProductSales.add(product);
             orderItemList.add(OrderItem.builder()
                             .price(vendorProduct.getPrice())
                             .order(newOrder)
@@ -84,6 +86,7 @@ public class OrderManagementServiceImp implements OrderManagementService {
 
         try {
             orderRepository.save(newOrder);
+            productRepository.saveAll(updatedProductSales);
             vendorProductRepository.saveAll(vendorProductList);
             orderItemRepository.saveAll(orderItemList);
         }catch (DatabasePersistenceException e){
@@ -106,18 +109,20 @@ public class OrderManagementServiceImp implements OrderManagementService {
             throw new CustomBadRequestException("user is not authorized to change order item status");
         }
 
-
         OrderItem orderItem = orderItemRepository.findById(orderItemStatusDto.getOrderItemId())
                 .orElseThrow(() -> new CustomNotFoundException("order item is not found"));
+
+        if(orderItem.getStatus() == OrderItemStatus.DELIVERED) throw new CustomBadRequestException("U can't change order status after it has been delivered ");
 
         orderItem.setStatus(orderItemStatusDto.getOrderItemStatus());
 
         try {
-            if(orderItemStatusDto.getOrderItemStatus() == OrderItemStatus.CANCELLED){
+            if(orderItemStatusDto.getOrderItemStatus() == OrderItemStatus.CANCELLED && orderItem.getStatus() != OrderItemStatus.CANCELLED){
                 VendorProduct vendorProduct = vendorProductRepository.findById(
                         orderItemStatusDto.getVendorProductId()
                 ).orElseThrow(() -> new CustomNotFoundException("vendor product is not found"));
-
+                Product product = vendorProduct.getProduct();
+                product.setSalesCount(product.getSalesCount() - 1);
                 vendorProduct.setStock(vendorProduct.getStock() + 1);
                 vendorProductRepository.save(vendorProduct);
             }

@@ -1,0 +1,7 @@
+
+
+ALTER TABLE product
+ADD COLUMN sales_count INT DEFAULT 0;
+
+ALTER TABLE product
+ADD COLUMN views_count INT DEFAULT 0;
