@@ -15,5 +15,5 @@ public interface RedisNotificationMessagesManagementService {
 
     Object getNotificationMessageAssociatedData(String notificationMessageId);
 
-    List<NotificationData> getAllNotificationMessages(String userEmail);
+    List<Object> getAllNotificationMessages(String userEmail);
 }

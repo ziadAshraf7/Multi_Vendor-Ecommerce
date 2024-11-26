@@ -3,6 +3,7 @@ package com.example.ecommerce_app.Services.Authentication;
 import com.example.ecommerce_app.Dto.Authentication.LoginDto;
 import com.example.ecommerce_app.Dto.Authentication.SuccessfulLoginInfo;
 import com.example.ecommerce_app.Entity.User;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomAuthorizationException;
 import com.example.ecommerce_app.Services.JWT.JwtService;
@@ -37,6 +38,8 @@ public class AuthenticationServiceImp implements AuthenticationService{
     @Override
     public SuccessfulLoginInfo loginWithJwt(LoginDto loginDto) {
         User user = userService.getUserEntityByEmail(loginDto.getEmail());
+
+        if(user == null) throw new CustomNotFoundException("User is not Exists");
 
         if(!passwordEncoder.matches(loginDto.getPassword() , user.getPassword())){
             throw new CustomAuthorizationException("Password is incorrect");

@@ -3,12 +3,10 @@ package com.example.ecommerce_app.Services.RedisNotificationMessagesManagement;
 import com.example.ecommerce_app.Services.NotificationService.DataModel.NotificationData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -43,9 +41,8 @@ implements RedisNotificationMessagesManagementService
     }
 
     @Override
-    public List<NotificationData> getAllNotificationMessages(String userEmail) {
+    public List<Object> getAllNotificationMessages(String userEmail) {
         List<Object> redisData = template.opsForList().range(userEmail, 0, -1 );
-        return redisData.stream()
-                .map(data -> (NotificationData) data) // Cast to NotificationData
-                .collect(Collectors.toList());    }
+        return redisData;
+    }
 }
