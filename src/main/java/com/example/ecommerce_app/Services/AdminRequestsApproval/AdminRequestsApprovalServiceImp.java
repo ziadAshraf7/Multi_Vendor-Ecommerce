@@ -2,15 +2,15 @@ package com.example.ecommerce_app.Services.AdminRequestsApproval;
 
 
 import com.example.ecommerce_app.Dto.ProductRejectionRequest.ProductRejectionRequestDto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
-import com.example.ecommerce_app.Entity.User;
+import com.example.ecommerce_app.Dto.Product_Table.ProductCreationDto;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
+import com.example.ecommerce_app.Projections.User.UserGeneralInfoInfoView;
+import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Services.NotificationService.DataModel.PendingProductApprovalNotificationMessage;
 import com.example.ecommerce_app.Services.NotificationService.DataModel.ProductApprovalStatus;
 import com.example.ecommerce_app.Services.NotificationService.Services.NotificationService;
 import com.example.ecommerce_app.Services.ProductManagement.ProductManagementService;
 import com.example.ecommerce_app.Services.RedisNotificationMessagesManagement.RedisNotificationMessagesManagementService;
-import com.example.ecommerce_app.Services.User.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,6 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
 
     private final NotificationService notificationService;
 
-    private final UserService userService;
 
     private final ProductManagementService productManagementService;
 
@@ -36,11 +35,12 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
 
     private final RedisNotificationMessagesManagementService redisNotificationMessagesManagementService;
 
+    private final UserRepository userRepository;
 
     @Override
     public void rejectProduct(ProductRejectionRequestDto productRejectionRequestDto)  {
 
-       User vendor = userService.getUserEntityById(productRejectionRequestDto.getVendorId());
+        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfo(productRejectionRequestDto.getVendorId());
 
        try {
 
@@ -66,16 +66,16 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
 
     @Transactional
     @Override
-    public void acceptProduct(Product_Creation_Dto productCreationDto , String notificationMessageId) throws IOException {
-       User vendor = userService.getUserEntityById(productCreationDto.getVendorId());
+    public void acceptProduct(ProductCreationDto productCreationDto , String notificationMessageId) throws IOException {
+        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfo(productCreationDto.getVendorId());
 
-//        try {
-//            redisNotificationMessagesManagementService.deleteNotificationMessageAssociatedData(
-//                    notificationMessageId
-//            );
-//        }catch (CustomRuntimeException e){
-//            throw new CustomRuntimeException("Unable to find any associated data with this messageId");
-//        }
+        try {
+            redisNotificationMessagesManagementService.deleteNotificationMessageAssociatedData(
+                    notificationMessageId
+            );
+        }catch (CustomRuntimeException e){
+            throw new CustomRuntimeException("Unable to find any associated data with this messageId");
+        }
 
 
         productManagementService.addProduct(productCreationDto);
@@ -87,7 +87,7 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
                 .message("your request for " + productCreationDto.getName()  + " creating request has been Successfully accepted from the Admin")
                 .build();
 
-//        notificationService.sendNotification(pendingProductApprovalNotificationMessage);
+        notificationService.sendNotification(pendingProductApprovalNotificationMessage);
 
     }
 

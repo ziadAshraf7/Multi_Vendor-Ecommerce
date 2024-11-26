@@ -16,7 +16,7 @@ public class CartItemResponseDto {
 
     private String title;
 
-    private byte[] thumbNail;
+    private String thumbNail;
 
     private double price;
 

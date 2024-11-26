@@ -1,6 +1,6 @@
 package com.example.ecommerce_app.EventListners;
 
-import com.example.ecommerce_app.Notification.Services.NotificationListenerService;
+import com.example.ecommerce_app.Services.NotificationService.Services.NotificationListenerService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.EventListener;

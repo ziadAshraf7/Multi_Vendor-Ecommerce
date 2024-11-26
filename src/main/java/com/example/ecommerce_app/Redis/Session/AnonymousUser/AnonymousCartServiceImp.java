@@ -13,7 +13,7 @@ import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductReposito
 import com.example.ecommerce_app.Services.Cart.CartService;
 import com.example.ecommerce_app.Services.Product.ProductService;
 import com.example.ecommerce_app.Redis.Session.SessionManagement.SessionService;
-import com.example.ecommerce_app.Services.Vendor_Product.Vendor_Product_Service;
+import com.example.ecommerce_app.Services.Vendor_Product.VendorProductService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class AnonymousCartServiceImp implements AnonymousCartService{
 
     private final ProductService productService;
 
-    private final Vendor_Product_Service vendor_product_service;
+    private final VendorProductService vendor_product_service;
 
     private final CartItemMapper cartItemMapper;
 
