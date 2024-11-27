@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class OrderItemBatchSavedDto {
 
-    @NotNull(message = "order id cannot be null")
+    @NotNull(message = "customer id cannot be null")
     private long customerId;
 
     @NotNull(message = "orderItemGeneralDtoList cannot be null")

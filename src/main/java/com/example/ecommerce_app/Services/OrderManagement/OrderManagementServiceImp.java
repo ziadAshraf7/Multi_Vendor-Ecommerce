@@ -5,6 +5,7 @@ import com.example.ecommerce_app.Dto.OrderItem.OrderItemStatusDto;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Entity.Enums.OrderItemStatus;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Repositery.Order.OrderRepository;
@@ -46,40 +47,44 @@ public class OrderManagementServiceImp implements OrderManagementService {
     @Transactional
     @Override
     public void makeOrder(OrderItemBatchSavedDto orderItemBatchSavedDto) {
-        cartItemService.removeAllFromCart(orderItemBatchSavedDto.getCustomerId());
 
         User customer = userRepository.findById(orderItemBatchSavedDto.getCustomerId())
                 .orElseThrow(() -> new CustomNotFoundException("user is not found") );
 
+        long cartId = customer.getCart().get(0).getId();
+
+        cartItemService.removeAllFromCart(cartId);
+
         Order newOrder = Order.builder().customer(customer).build();
 
 
-        List<Long> productIdList = new ArrayList<>(orderItemBatchSavedDto.getOrderItemGeneralDtoList().size());
         List<Long> vendorProductsIdList = new ArrayList<>(orderItemBatchSavedDto.getOrderItemGeneralDtoList().size());
+        List<Integer> quantities = new ArrayList<>();
         orderItemBatchSavedDto.getOrderItemGeneralDtoList().forEach(orderItemGeneralDto -> {
-            productIdList.add(orderItemGeneralDto.getProductId());
+            quantities.add(orderItemGeneralDto.getQuantity());
             vendorProductsIdList.add(orderItemGeneralDto.getVendorProductId());
         });
 
 
-        List<Product> products = productRepository.findAllById(productIdList);
         List<VendorProduct> vendorProductList = vendorProductRepository.findAllVendorProductById(vendorProductsIdList);
 
-        products.sort(Comparator.comparing(Product::getId));
-        vendorProductList.sort(Comparator.comparing(vendorProduct -> vendorProduct.getProduct().getId()));
 
-        List<OrderItem> orderItemList = new ArrayList<>(products.size());
-        List<Product> updatedProductSales = new ArrayList<>(products.size());
-        for(int i = 0 ; i< products.size() ; i++){
+        List<OrderItem> orderItemList = new ArrayList<>(vendorProductList.size());
+        List<Product> updatedProductSales = new ArrayList<>(vendorProductList.size());
+        for(int i = 0 ; i< vendorProductList.size() ; i++){
+            int quantity = quantities.get(0);
             VendorProduct vendorProduct = vendorProductList.get(i);
             vendorProduct.setStock(vendorProduct.getStock() - 1);
-            Product product = products.get(i);
+            Product product = vendorProduct.getProduct();
             product.setSalesCount(product.getSalesCount() + 1);
             updatedProductSales.add(product);
             orderItemList.add(OrderItem.builder()
                             .price(vendorProduct.getPrice())
                             .order(newOrder)
                             .product(product)
+                            .quantity(quantity)
+                            .vendor(vendorProduct.getVendor())
+                            .status(OrderItemStatus.SHIPPED)
                     .build());
             newOrder.setTotalAmount(newOrder.getTotalAmount() + vendorProduct.getPrice());
         }

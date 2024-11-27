@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @SuperBuilder
-@Table(name = "order" ,
+@Table(name = "`order`" ,
         indexes = {
         @Index(name = "idx_customer_created_status",
                 columnList = "customer_id,total_amount , status, created_at, updated_at"

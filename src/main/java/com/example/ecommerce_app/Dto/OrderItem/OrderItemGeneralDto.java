@@ -16,6 +16,4 @@ public class OrderItemGeneralDto {
     @NotNull(message = "vendorProductId cannot be null")
     private long vendorProductId;
 
-    @NotNull(message = "productId cannot be null")
-    private long productId;
 }
