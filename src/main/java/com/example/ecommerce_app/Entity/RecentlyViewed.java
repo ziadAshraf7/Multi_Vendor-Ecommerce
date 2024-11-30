@@ -4,6 +4,7 @@ import com.example.ecommerce_app.Entity.Embedded_Ids.RecentlyViewedEmbeddedId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @Table(name = "recently_viewed")
 public class RecentlyViewed {
 

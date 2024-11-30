@@ -1,7 +1,7 @@
 package com.example.ecommerce_app.Redis.Session.SessionManagement;
 
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Redis.Session.AnonymousUser.AnonymousUserCartData;
+import com.example.ecommerce_app.Redis.Session.SessionData.AnonymousUserSessionData;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,14 +14,16 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @Data
 @Slf4j
-public class UserCartSessionServiceImp implements SessionService{
+public class RedisSessionServiceImp implements SessionService{
 
     private HttpSession httpSession;
 
     @Override
-    public AnonymousUserCartData getSessionData(String sessionId) {
+    public AnonymousUserSessionData getSessionData(String sessionId) {
         try {
-            return (AnonymousUserCartData) httpSession.getAttribute(sessionId);
+            Object o = httpSession.getAttribute(sessionId);
+            System.out.println(o);
+            return (AnonymousUserSessionData) httpSession.getAttribute(sessionId);
         }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Could not retrieve data from Session");
@@ -31,7 +33,7 @@ public class UserCartSessionServiceImp implements SessionService{
     @Override
     public void addToSession(String sessionId , Object data) {
         try {
-            httpSession.setAttribute(sessionId , (AnonymousUserCartData) data);
+            httpSession.setAttribute(sessionId , (AnonymousUserSessionData) data);
         }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Could not add to Session");
@@ -40,7 +42,8 @@ public class UserCartSessionServiceImp implements SessionService{
 
     @Override
     public void createSession(HttpSession httpSession) {
-         httpSession.setAttribute(httpSession.getId() , new AnonymousUserCartData(new ArrayList<>(50)));
+        System.out.println(httpSession.getId());
+         httpSession.setAttribute(httpSession.getId() , new AnonymousUserSessionData(new ArrayList<>(50 )));
     }
 
     @Override
