@@ -19,5 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             .UserGeneralInfoInfoView(u.id , u.email , u.userRole)
              FROM User u WHERE u.id = :id
             """ )
-    UserGeneralInfoInfoView findGeneralInfo(@Param("id") long id );
+    UserGeneralInfoInfoView findGeneralInfoById(@Param("id") long id );
+
+    @Query("""
+            SELECT new com.example.ecommerce_app.Projections.User
+            .UserGeneralInfoInfoView(u.id , u.email , u.userRole)
+             FROM User u WHERE u.email = :email
+            """ )
+    UserGeneralInfoInfoView findGeneralInfoByEmail(@Param("email") String email );
 }

@@ -15,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 public class UserInfoDetails implements Serializable {
 
+    private long id;
+
     private String userName;
 
     private String email;

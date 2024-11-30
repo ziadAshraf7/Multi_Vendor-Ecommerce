@@ -1,6 +1,7 @@
 package com.example.ecommerce_app.Services.User;
 
 
+import com.example.ecommerce_app.Dto.AutheticatedUser.AuthenticatedUserDto;
 import com.example.ecommerce_app.Dto.User.UserCreationDto;
 import com.example.ecommerce_app.Dto.User.UserInfoDetails;
 import com.example.ecommerce_app.Entity.User;
@@ -15,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -122,10 +125,10 @@ public class UserServiceImp implements UserService {
     public UserInfoDetails getUserByEmail(String Email) {
 
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+         AuthenticatedUserDto authenticatedUserDto = ((AuthenticatedUserDto) authentication.getPrincipal());
           User user = userRepository.findByEmail(Email);
         if(user == null) throw new CustomNotFoundException("Cannot find Email " + Email);
-        if(user.getUserRole() != UserRoles.ROLE_ADMIN || user.getEmail() != authentication.getPrincipal() )
+        if(user.getUserRole() != UserRoles.ROLE_ADMIN || !Objects.equals(user.getEmail(), authenticatedUserDto.getEmail()))
               throw new CustomBadRequestException("User is not authorized");
           return userMapper.toUserInfoDetails(user);
     }
