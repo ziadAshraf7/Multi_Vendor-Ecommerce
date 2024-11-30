@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Table(name = "order_item" , indexes = {
-        @Index(name = "idx_unique_customer_order",
-                columnList = "customer_id, order_id",
+        @Index(name = "idx_unique_cart_order",
+                columnList = "product_id, order_id",
                 unique = true)
 })
 @SuperBuilder

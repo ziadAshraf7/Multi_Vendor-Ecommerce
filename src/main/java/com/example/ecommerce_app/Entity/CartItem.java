@@ -1,10 +1,7 @@
 package com.example.ecommerce_app.Entity;
 
-import com.example.ecommerce_app.Entity.Embedded_Ids.CartItem_EmbeddedId;
+import com.example.ecommerce_app.Entity.Embedded_Ids.CartItemEmbeddedId;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +18,7 @@ import java.time.LocalDateTime;
 public class CartItem {
 
     @EmbeddedId
-    private CartItem_EmbeddedId id;
+    private CartItemEmbeddedId id;
 
     @Column(name = "quantity" , nullable = false)
     private int quantity;

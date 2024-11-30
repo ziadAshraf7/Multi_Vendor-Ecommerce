@@ -14,7 +14,5 @@ public class RemoveFromCartDto {
 
     private long productId;
 
-    private long customerId;
-
     private long vendorProductId;
 }

@@ -13,8 +13,6 @@ public class OrderItemStatusDto {
 
     private OrderItemStatus orderItemStatus;
 
-    private long customerId;
-
     private long orderItemId;
 
     private long vendorProductId;

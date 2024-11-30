@@ -54,9 +54,7 @@ public class CartServiceImp implements CartService{
     @Transactional(readOnly = true)
     @Override
     public Cart getCartByCustomerId(long customerId) {
-          return cartRepository.findById(customerId).orElseThrow(
-                  () -> new CustomNotFoundException("cart is not found for user id " + customerId )
-          );
+          return cartRepository.findByCustomerId(customerId);
     }
 
     @Transactional

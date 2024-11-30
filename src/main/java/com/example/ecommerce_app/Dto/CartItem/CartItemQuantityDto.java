@@ -15,7 +15,7 @@ public class CartItemQuantityDto {
 
     private long vendorProductId;
 
-    private long customerId;
-
     private long productId;
+
+    private long cartId;
 }

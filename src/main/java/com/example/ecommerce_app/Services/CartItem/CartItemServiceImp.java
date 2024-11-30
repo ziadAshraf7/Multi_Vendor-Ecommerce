@@ -1,10 +1,13 @@
 package com.example.ecommerce_app.Services.CartItem;
+import com.example.ecommerce_app.Dto.AutheticatedUser.AuthenticatedUserDto;
 import com.example.ecommerce_app.Dto.CartItem.*;
 import com.example.ecommerce_app.Entity.*;
-import com.example.ecommerce_app.Entity.Embedded_Ids.CartItem_EmbeddedId;
+import com.example.ecommerce_app.Entity.Embedded_Ids.CartItemEmbeddedId;
 import com.example.ecommerce_app.Exceptions.Exceptions.*;
 import com.example.ecommerce_app.Mapper.CartItemMapper;
+import com.example.ecommerce_app.Repositery.Cart.CartRepository;
 import com.example.ecommerce_app.Repositery.CartItem.CartItemRepository;
+import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Cart.CartService;
 import lombok.AllArgsConstructor;
@@ -12,6 +15,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,47 +36,48 @@ public class CartItemServiceImp implements CartItemService{
 
     private final VendorProductRepository vendorProductRepository;
 
+    private final CartRepository cartRepository;
+
+    private final UserRepository userRepository;
+
     @Transactional(readOnly = true)
     @Override
-    public List<CartItemResponseDto> getCartItemsByCartId(long customerId , Pageable pageable ) {
-        try {
-            Page<CartItem> cartItems = cartItemRepository.findByCartId(customerId , pageable);
+    public List<CartItemResponseDto> getCartItems(Pageable pageable ) {
+        long authenticatedUserId = ((AuthenticatedUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        User user = userRepository.findById(authenticatedUserId).orElseThrow(() -> new CustomNotFoundException("user is not found"));
+            Page<CartItem> cartItems = cartItemRepository.findByCartId(user.getCart().get(0).getId() , pageable);
             List<CartItemResponseDto> cartItemDtos = new ArrayList<>(cartItems.getNumberOfElements());
             for(CartItem cartItem : cartItems) cartItemDtos.add(cartItemMapper.fromEntityToResponseDto(cartItem));
             return cartItemDtos;
-        }catch (CustomNotFoundException e){
-            log.error(e.getMessage());
-            throw new CustomNotFoundException("unable to retrieve cart items");
-        }
     }
 
 
     @Transactional(readOnly = true)
     @Override
     public boolean existsByProductId(long productId) {
-        try {
             return cartItemRepository.existsByProductId(productId);
-        }catch (CustomNotFoundException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("encountered error while checking the existing of a cart item");
-        }
     }
 
     @Override
     @Transactional
     public void modifyCartItemQuantity(CartItemQuantityDto cartItemQuantityDto) {
 
-        VendorProduct vendorProduct = vendorProductRepository.findById(
-                cartItemQuantityDto.getVendorProductId()
-        ).orElseThrow(() -> new CustomNotFoundException("vendor product is not found"));
+        long authenticatedUserId = ((AuthenticatedUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
-        CartItem cartItem = cartItemRepository.findByProductIdAndCartIdAndVendorProductId(
-                cartItemQuantityDto.getProductId(),
-                cartItemQuantityDto.getCustomerId(),
+        VendorProduct vendorProduct = vendorProductRepository.findByVendorProductId(
                 cartItemQuantityDto.getVendorProductId()
         );
 
+        if(vendorProduct == null) throw new CustomNotFoundException("vendor product is not found");
+
+        CartItem cartItem = cartItemRepository.findByProductIdAndCartIdAndVendorProductId(
+                vendorProduct.getProduct().getId(),
+                cartItemQuantityDto.getCartId(),
+                vendorProduct.getId()
+        );
         if (cartItem == null) throw new CustomNotFoundException("Unable to find cart item");
+
+        if(cartItem.getCart().getCustomer().getId() != authenticatedUserId) throw new CustomBadRequestException("user is not authorized");
 
         int newQuantity = cartItemQuantityDto.getQuantity();
         if (vendorProduct.getStock() >= newQuantity) {
@@ -80,85 +85,81 @@ public class CartItemServiceImp implements CartItemService{
         } else {
             throw new CustomBadRequestException("product is ran out of stock");
         }
-
-        try {
             cartItemRepository.save(cartItem);
-        } catch (DatabasePersistenceException e) {
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("unable to update cart item ");
-        }
     }
 
 
     @Override
     @Transactional
-    public void addToCart(AuthUserCartItemCreationDto authUserCartItemCreationDto) {
+    public void addToCart(CartItemDto cartItemDto) {
 
-        Cart cart = cartService.getCartByCustomerId(authUserCartItemCreationDto.getCustomerId());
+        long authenticatedUserId = ((AuthenticatedUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
-        VendorProduct vendorProduct = vendorProductRepository.findById(authUserCartItemCreationDto.getVendorProductId())
-                .orElseThrow(() -> new CustomNotFoundException("vendorProduct is not found"));
+        Cart cart = cartService.getCartByCustomerId(authenticatedUserId);
 
+        if(cart == null) throw new CustomNotFoundException("cart is not found");
 
+        VendorProduct vendorProduct = vendorProductRepository.findByVendorProductId(cartItemDto.getVendorProductId());
         if (vendorProduct == null) throw new CustomNotFoundException("Cannot find vendor product");
+
         Product product = vendorProduct.getProduct();
 
         int productStock = vendorProduct.getStock();
 
         if (productStock == 0) throw new CustomBadRequestException("product is ran out of stock");
 
-        if (authUserCartItemCreationDto.getQuantity() > productStock)
+        if (cartItemDto.getQuantity() > productStock)
             throw new CustomConflictException("quantity selected is greater than product stock");
 
+        CartItem excistingCartItem = cartItemRepository.findByProductIdAndCartIdAndVendorProductId(
+                product.getId() ,
+                cart.getId() ,
+                vendorProduct.getId()
+        );
+
+        if(excistingCartItem != null) throw new CustomNotFoundException("cart item is already exists");
+
         CartItem cartItem = CartItem.builder()
-                .id(new CartItem_EmbeddedId(
-                        authUserCartItemCreationDto.getCustomerId(),
-                        authUserCartItemCreationDto.getProductId(),
-                        authUserCartItemCreationDto.getVendorProductId()
+                .id(new CartItemEmbeddedId(
+                        authenticatedUserId,
+                        product.getId(),
+                        vendorProduct.getId()
                 ))
                 .vendorProduct(vendorProduct)
                 .cart(cart)
                 .product(product)
-                .quantity(authUserCartItemCreationDto.getQuantity())
+                .quantity(cartItemDto.getQuantity())
                 .build();
-        try {
+
             cartItemRepository.save(cartItem);
-        } catch (DatabasePersistenceException e) {
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("Cart item is already existed in cart");
-        }
 
     }
 
     @Override
     @Transactional
     public void removeFromCart(RemoveFromCartDto removeFromCartDto) {
-        try {
+        long authenticatedUserId = ((AuthenticatedUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+
             CartItem cartItem = cartItemRepository.findByProductIdAndCartIdAndVendorProductId(
                     removeFromCartDto.getProductId(),
-                    removeFromCartDto.getCustomerId(),
+                    authenticatedUserId,
                     removeFromCartDto.getVendorProductId()
             );
             if (cartItem == null) throw new CustomNotFoundException("unable to find cart item");
             cartItemRepository.delete(cartItem);
-        } catch (DatabasePersistenceException e) {
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("Unable to delete product from cart");
-        }
+
     }
 
 
     @Override
     @Transactional
-    public void removeAllFromCart(long customerId) {
-        try {
-            Cart cart = cartService.getCartByCustomerId(customerId);
-            if (cart == null) throw new CustomNotFoundException("cart is not found");
-            cartItemRepository.deleteAllBYCustomerId(customerId);
-        } catch (DatabasePersistenceException e) {
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("Unable to remove all Products from Cart");
-        }
+    public void removeAllFromCart(long cartId) {
+            Cart cart = cartRepository.findById(cartId).orElseThrow(
+                    () -> new CustomNotFoundException("cart is not found")
+            );
+
+            cartItemRepository.deleteAllBYCartId(cart.getId());
+
     }
 
 }

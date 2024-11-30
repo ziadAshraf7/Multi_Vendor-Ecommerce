@@ -8,11 +8,11 @@ import java.util.List;
 public interface CartItemService {
 
 
-    List<CartItemResponseDto> getCartItemsByCartId(long customerId  ,Pageable pageable);
+    List<CartItemResponseDto> getCartItems(Pageable pageable);
 
     boolean existsByProductId(long productId);
 
-    void addToCart(AuthUserCartItemCreationDto authUserCartItemCreationDto);
+    void addToCart(CartItemDto cartItemDto);
 
     void modifyCartItemQuantity(CartItemQuantityDto cartItemQuantityDto);
 
