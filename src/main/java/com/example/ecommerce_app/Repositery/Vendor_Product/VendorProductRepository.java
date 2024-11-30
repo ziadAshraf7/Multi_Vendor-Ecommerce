@@ -23,6 +23,7 @@ public interface VendorProductRepository extends JpaRepository<VendorProduct, Lo
     void deleteVendorProduct(@Param("vendorId") long vendorId , @Param("productId") long productId);
 
     @Query("SELECT vp FROM VendorProduct vp WHERE vp.id = :vendorProductId")
+    @EntityGraph(attributePaths = {"product"})
     VendorProduct findByVendorProductId(long vendorProductId);
 
 
@@ -32,5 +33,9 @@ public interface VendorProductRepository extends JpaRepository<VendorProduct, Lo
 
     @Query("SELECT vp FROM VendorProduct vp WHERE vp.id IN :idList")
     @EntityGraph(attributePaths = {"product"})
-    List<VendorProduct> findAllVendorProductById(List<Long> idList);
+    Page<VendorProduct> findAllVendorProductById(List<Long> idList , Pageable pageable);
+
+    @Query("SELECT vp FROM VendorProduct vp WHERE vp.id IN :idList")
+    @EntityGraph(attributePaths = {"product"})
+    List<VendorProduct> findAllVendorProductById(List<Long> idList  );
 }

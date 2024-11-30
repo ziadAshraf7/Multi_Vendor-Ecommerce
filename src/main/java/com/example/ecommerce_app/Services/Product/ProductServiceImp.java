@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +31,6 @@ public class ProductServiceImp implements ProductService
   private final ProductMapper productMapper;
 
   private CategoryService categoryService;
-
-  private final PageRequest pageable = PageRequest.of(0, 10);
 
   private final ProductSpecification productSpecification;
 
@@ -88,35 +88,18 @@ public class ProductServiceImp implements ProductService
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductOverviewDto> getProductsByCategoryId(long categoryId) {
+    public Page<ProductOverviewDto> getProductsByCategoryId(long categoryId , Pageable pageable) {
 
-        Category category = categoryService.getCategoryEntityById(categoryId);
-
-        Page<Product> products = productRepository.findBySubCategory(category , pageable);
+        Page<Product> products = productRepository.findBySubCategoryId(categoryId , pageable);
 
         return products.map(productMapper::toProductOverviewDto);
      }
 
 
-    @Override
-    @Transactional(readOnly = true)
-    public ProductDetailedDto getProductById(long productId) {
-           Product product = productRepository.getEagerProductEntity(productId);
-           return productMapper.to_Product_Detailed_Dto(product);
-    }
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDetailedDto getProductByName(String name) {
-            Product product = productRepository.findByName(name);
-            if(product == null) throw new CustomNotFoundException("Unable to find product name " + name);
-            return productMapper.to_Product_Detailed_Dto(product);
-    }
-
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ProductOverviewDto> getNewArrivalProducts(long categoryId) {
+    public Page<ProductOverviewDto> getNewArrivalProducts(long categoryId , Pageable pageable) {
             categoryService.getCategoryEntityById(categoryId);
             Page<Product> products = productRepository.getFeaturedProducts(categoryId , pageable);
             return products.map(productMapper::toProductOverviewDto);
@@ -125,7 +108,7 @@ public class ProductServiceImp implements ProductService
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductOverviewDto> getDiscountProducts(long categoryId) {
+    public Page<ProductOverviewDto> getDiscountProducts(long categoryId , Pageable pageable) {
         categoryService.getCategoryEntityById(categoryId);
         Page<Product> products = productRepository.getDiscountProducts(categoryId , pageable);
         return products.map(productMapper::toProductOverviewDto);
@@ -133,20 +116,63 @@ public class ProductServiceImp implements ProductService
 
      @Override
      @Transactional(readOnly = true)
-     public Page<ProductOverviewDto> getBestSellerProductsPerBrand(long brandId) {
-         return null;
+     public Page<ProductOverviewDto> getBestSellerProductsPerBrand(long brandId , Pageable pageable) {
+         pageable = PageRequest.of(
+                 pageable.getPageNumber(),
+                 pageable.getPageSize(),
+                 Sort.by(Sort.Direction.DESC, "salesCount")
+         );
+
+        Page<Product> products = productRepository.findByBrandId(brandId , pageable);
+
+        return products.map(productMapper::toProductOverviewDto);
+
      }
 
 
      @Override
      @Transactional(readOnly = true)
-     public Page<ProductOverviewDto> getBestSellerProductsPerCategory(long categoryId) {
-         return null;
+     public Page<ProductOverviewDto> getBestSellerProductsPerCategory(long categoryId , Pageable pageable) {
+         pageable = PageRequest.of(
+                 pageable.getPageNumber(),
+                 pageable.getPageSize(),
+                 Sort.by(Sort.Direction.DESC, "salesCount")
+         );
+
+         Page<Product> products = productRepository.findBySubCategoryId(categoryId , pageable);
+
+         return products.map(productMapper::toProductOverviewDto);
+     }
+
+     @Override
+     public Page<ProductOverviewDto> getMostViewedProductsPerBrand(long brandId, Pageable pageable) {
+         pageable = PageRequest.of(
+                 pageable.getPageNumber(),
+                 pageable.getPageSize(),
+                 Sort.by(Sort.Direction.DESC, "viewsCount")
+         );
+
+         Page<Product> products = productRepository.findByBrandId(brandId , pageable);
+
+         return products.map(productMapper::toProductOverviewDto);
+     }
+
+     @Override
+     public Page<ProductOverviewDto> getMostViewedProductsPerCategory(long categoryId, Pageable pageable) {
+         pageable = PageRequest.of(
+                 pageable.getPageNumber(),
+                 pageable.getPageSize(),
+                 Sort.by(Sort.Direction.DESC, "viewsCount")
+         );
+
+         Page<Product> products = productRepository.findBySubCategoryId(categoryId , pageable);
+
+         return products.map(productMapper::toProductOverviewDto);
      }
 
      @Override
      @Transactional(readOnly = true)
-     public Page<ProductOverviewDto> filterProducts(ProductFilterDto productFilterDto) {
+     public Page<ProductOverviewDto> filterProducts(ProductFilterDto productFilterDto , Pageable pageable) {
          Specification<Product> predicate = productSpecification.filterProducts(productFilterDto);
          Page<Product> productPage = productRepository.findAll(predicate, pageable);
          return productPage.map(productMapper::toProductOverviewDto);
@@ -160,7 +186,7 @@ public class ProductServiceImp implements ProductService
      }
 
      @Override
-     public Page<ProductOverviewDto> getProductsPerBrand(long brandId) {
+     public Page<ProductOverviewDto> getProductsPerBrand(long brandId , Pageable pageable) {
 
             brandService.getBrandEntityById(brandId);
 

@@ -57,7 +57,7 @@ public interface ProductMapper {
             @Mapping(source = "reviews" , target = "reviewsDtos" , qualifiedByName = "mapTo_ProductReview_Detailed_Dto"),
             @Mapping(source = "attributeValues" , target = "attributeDtoListMap" , qualifiedByName = "mapToAttributeValuesDetails"),
     })
-    ProductDetailedDto to_Product_Detailed_Dto(Product product);
+    ProductDetailedDto toProductDetailedDto(Product product);
 
     @Named("mapToAttributeValuesDetails")
     default Map<AttributeDto, List<ProductAttributeValueDto>>  mapToAttributeValuesDetails(

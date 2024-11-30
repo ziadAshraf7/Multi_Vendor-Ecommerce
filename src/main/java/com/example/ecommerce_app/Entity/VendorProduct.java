@@ -33,7 +33,7 @@ public class VendorProduct extends BaseEntity {
         super();
     }
 
-    @ManyToOne( fetch = FetchType.LAZY)
+    @ManyToOne( fetch = FetchType.LAZY , cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "product_id")
     private Product product;
 

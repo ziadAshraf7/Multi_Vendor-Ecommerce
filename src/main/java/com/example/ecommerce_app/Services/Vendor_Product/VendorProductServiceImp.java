@@ -8,9 +8,7 @@ import com.example.ecommerce_app.Entity.Product;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Entity.VendorProduct;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
-import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Mapper.Vendor_Product_Mapper;
 import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
 import com.example.ecommerce_app.Services.Product.ProductService;
@@ -50,13 +48,7 @@ public class VendorProductServiceImp implements VendorProductService {
         if(vendorProductUpdateDto.getPrice() <= 0 ) throw new CustomBadRequestException("Price cannot be less than 0");
 
         vendorProduct.setPrice(vendorProductUpdateDto.getPrice());
-
-        try {
-            vendorProductRepository.save(vendorProduct);
-        }catch (DatabasePersistenceException e){
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("Database error while updating product price");
-        }
+        vendorProductRepository.save(vendorProduct);
 
     }
 
@@ -73,28 +65,21 @@ public class VendorProductServiceImp implements VendorProductService {
         vendorProduct.setProduct(product);
         vendorProduct.setVendor(vendor);
 
-        try {
             vendorProductRepository.save(vendorProduct);
             return vendor_product_mapper.toVendorProductOverviewDto(vendorProduct);
-        }catch (CustomRuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("Unable to link Vendor with Product");
-        }
+
     }
 
     @Override
     @Transactional
     public void deleteVendorProduct(VendorProductDeleteDto vendorProductDeleteDto) {
-        try {
             VendorProduct vendorProduct = vendorProductRepository.findByVendorIdAndProductId(
                     vendorProductDeleteDto.getVendorId(),
                     vendorProductDeleteDto.getProductId()
             );
             if(vendorProduct == null) throw new CustomNotFoundException("vendor product is not found");
             vendorProductRepository.deleteVendorProduct(vendorProductDeleteDto.getVendorId() , vendorProductDeleteDto.getProductId());
-        }catch (CustomRuntimeException e){
-            throw new CustomRuntimeException("Unable to unlink the vendor from the product");
-        }
+
     }
 
     @Override

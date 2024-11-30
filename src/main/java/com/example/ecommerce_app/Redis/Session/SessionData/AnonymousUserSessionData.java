@@ -1,6 +1,7 @@
-package com.example.ecommerce_app.Redis.Session.AnonymousUser;
+package com.example.ecommerce_app.Redis.Session.SessionData;
 
 import com.example.ecommerce_app.Dto.CartItem.CartItemDto;
+import com.example.ecommerce_app.Projections.RecentlyViewed.RecentlyViewedGeneralInfoView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +14,9 @@ import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
-public class AnonymousUserCartData implements Serializable {
-
+public class AnonymousUserSessionData implements Serializable {
 
     private List<CartItemDto> cartItems;
-
 
     public void addToCartItems(CartItemDto cartItem ){
         cartItems.add(cartItem);
@@ -30,7 +29,7 @@ public class AnonymousUserCartData implements Serializable {
         return null;
     }
 
-    public AnonymousUserCartData updateCartItemData(long productId , long vendorProductId , int quantity ){
+    public AnonymousUserSessionData updateCartItemData(long productId , long vendorProductId , int quantity ){
         for (CartItemDto cartItem : cartItems){
             if (cartItem.getProductId() == productId && cartItem.getVendorProductId() == vendorProductId) {
                 cartItem.setQuantity(quantity);
@@ -39,7 +38,7 @@ public class AnonymousUserCartData implements Serializable {
         return this;
     }
 
-    public AnonymousUserCartData removeFromCartItems(long productId , long vendorProductId){
+    public AnonymousUserSessionData removeFromCartItems(long productId , long vendorProductId){
         cartItems.removeIf((cartItem) -> cartItem.getProductId() == productId && cartItem.getVendorProductId() == vendorProductId);
         return this;
     }

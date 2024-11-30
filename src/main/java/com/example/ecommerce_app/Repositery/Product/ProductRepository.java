@@ -3,7 +3,6 @@ package com.example.ecommerce_app.Repositery.Product;
 
 import com.example.ecommerce_app.Entity.Category;
 import com.example.ecommerce_app.Entity.Product;
-import jakarta.persistence.NamedEntityGraph;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,7 +19,7 @@ public interface ProductRepository extends JpaRepository<Product ,Long > , JpaSp
     Product findByName(String productName);
 
     @EntityGraph(attributePaths = {"vendor_products" , "brand" , "subCategory"})
-    Page<Product> findBySubCategory(Category subCategory , Pageable pageable);
+    Page<Product> findBySubCategoryId(long subCategoryId , Pageable pageable);
 
 
     @Query("SELECT p FROM Product p LEFT JOIN p.subCategory c WHERE c.id = :categoryId  ORDER BY p.createdAt ASC")
@@ -42,4 +41,5 @@ public interface ProductRepository extends JpaRepository<Product ,Long > , JpaSp
     Product getEagerProductEntity(long productId);
 
     boolean existsByName(String name);
+
 }

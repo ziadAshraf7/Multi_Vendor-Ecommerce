@@ -1,5 +1,6 @@
 package com.example.ecommerce_app.Services.ProductDisplay;
 
+import com.example.ecommerce_app.Dto.AutheticatedUser.AuthenticatedUserDto;
 import com.example.ecommerce_app.Dto.Product_Table.ProductDetailedDto;
 import com.example.ecommerce_app.Entity.Embedded_Ids.RecentlyViewedEmbeddedId;
 import com.example.ecommerce_app.Entity.Product;
@@ -44,10 +45,8 @@ public class ProductDisplayServiceImp implements ProductDisplayService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if(authentication != null){
-            String userEmail = (String) authentication.getPrincipal();
-            System.out.println(userEmail);
+            String userEmail =  ((AuthenticatedUserDto) authentication).getEmail();
             UserGeneralInfoInfoView userGeneralInfoInfoView = userRepository.findGeneralInfoByEmail(userEmail);
-            System.out.println(userGeneralInfoInfoView);
             if(userGeneralInfoInfoView != null)  displayProduct(productId , userGeneralInfoInfoView.getId());
         }
         product.setViewsCount(product.getViewsCount() + 1);

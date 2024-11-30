@@ -81,7 +81,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
             if(subCategoryGeneralInfoEntity.getParentCategoryId() <= 0) throw new CustomBadRequestException("category is parent category");
             Category subCategoryReference = categoryRepository.getReferenceById(productCreationDto.getSubCategoryId());
 
-            UserGeneralInfoInfoView vendorGeneralInfoEntity = userRepository.findGeneralInfo(productCreationDto.getVendorId());
+            UserGeneralInfoInfoView vendorGeneralInfoEntity = userRepository.findGeneralInfoById(productCreationDto.getVendorId());
 
             if(vendorGeneralInfoEntity == null ) throw new CustomNotFoundException("user vendor is not found");
 
@@ -142,12 +142,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
                     .product(productReference)
                     .build();
 
-        try {
              vendorProductRepository.save(vendor_product);
-        }catch (DatabasePersistenceException e){
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("Unable to link the product with the vendor");
-        }
 
     }
 
@@ -168,14 +163,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
                         .build());
             }
 
-
-        try {
             vendor_product_image_repository.saveAll(vendor_product_imageList);
-        }catch (DatabasePersistenceException e){
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("Unable to add Images for the Product");
-        }
-
 
     }
 
@@ -207,11 +195,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
             }
         }
 
-        try {
             productAttributeValueRepository.saveAll(productAttributeValues);
-        }catch (DatabasePersistenceException e){
-            log.error(e.getMessage());
-            throw new DatabasePersistenceException("Attributes Entered are not Found");
-        }
+
     }
 }
