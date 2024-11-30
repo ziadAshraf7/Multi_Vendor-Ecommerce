@@ -8,5 +8,5 @@ public interface AuthenticationService {
 
    SuccessfulLoginInfo loginWithJwt(LoginDto loginDto);
 
-   Cookie logOut();
+   void logOut();
 }

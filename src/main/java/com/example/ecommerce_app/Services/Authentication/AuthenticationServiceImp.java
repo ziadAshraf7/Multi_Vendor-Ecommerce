@@ -13,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,7 +21,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.ecommerce_app.Utills.AuthenticationUtils.AUTHORIZATION_HEADER;
 
@@ -30,11 +34,15 @@ import static com.example.ecommerce_app.Utills.AuthenticationUtils.AUTHORIZATION
 @Slf4j
 public class AuthenticationServiceImp implements AuthenticationService{
 
+    public static final String tokenBlackListRedisKey = "blackList";
+
     private final UserService userService;
 
     private final PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
+
+    private final RedisTemplate<String , Object> redisTemplate;
 
     @Override
     public SuccessfulLoginInfo loginWithJwt(LoginDto loginDto) {
@@ -46,7 +54,9 @@ public class AuthenticationServiceImp implements AuthenticationService{
             throw new CustomAuthorizationException("Password is incorrect");
         }
 
-        AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(user.getEmail() , user.getId());
+        String token = jwtService.generateToken(loginDto.getEmail());
+
+        AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(user.getEmail() , user.getId() , token);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 authenticatedUserDto  ,
@@ -57,22 +67,16 @@ public class AuthenticationServiceImp implements AuthenticationService{
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return SuccessfulLoginInfo.builder()
-                .jwtToken(jwtService.generateToken(loginDto.getEmail()))
+                .jwtToken(token)
                 .userId(user.getId())
                 .build();
     }
 
     @Override
-    public Cookie logOut() {
-        try {
-            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, null);
-            cookie.setMaxAge(0);
-            return cookie;
-        }catch (CustomRuntimeException e){
-            log.error(e.getMessage());
-            throw new CustomRuntimeException("Error While Logout User");
-        }
-
+    public void logOut() {
+        String token = ((AuthenticatedUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getToken();
+        if(!Objects.requireNonNull(redisTemplate.opsForList().range(tokenBlackListRedisKey, 0, -1)).contains(token))
+            redisTemplate.opsForList().leftPush(tokenBlackListRedisKey , token);
     }
 
 }

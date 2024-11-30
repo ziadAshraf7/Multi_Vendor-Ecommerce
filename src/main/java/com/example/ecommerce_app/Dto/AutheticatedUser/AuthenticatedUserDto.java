@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class AuthenticatedUserDto {
     String email;
     long id;
+    String token;
 }
