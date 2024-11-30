@@ -2,6 +2,7 @@ package com.example.ecommerce_app.Services.Authentication;
 
 import com.example.ecommerce_app.Dto.Authentication.LoginDto;
 import com.example.ecommerce_app.Dto.Authentication.SuccessfulLoginInfo;
+import com.example.ecommerce_app.Dto.AutheticatedUser.AuthenticatedUserDto;
 import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
@@ -45,8 +46,10 @@ public class AuthenticationServiceImp implements AuthenticationService{
             throw new CustomAuthorizationException("Password is incorrect");
         }
 
+        AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(user.getEmail() , user.getId());
+
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                loginDto.getEmail() ,
+                authenticatedUserDto  ,
                 user.getPassword() ,
                 List.of(new SimpleGrantedAuthority(user.getUserRole().toString()))
         );

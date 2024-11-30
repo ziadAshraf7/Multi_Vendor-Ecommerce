@@ -40,7 +40,7 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
     @Override
     public void rejectProduct(ProductRejectionRequestDto productRejectionRequestDto)  {
 
-        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfo(productRejectionRequestDto.getVendorId());
+        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfoById(productRejectionRequestDto.getVendorId());
 
        try {
 
@@ -67,7 +67,7 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
     @Transactional
     @Override
     public void acceptProduct(ProductCreationDto productCreationDto , String notificationMessageId) throws IOException {
-        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfo(productCreationDto.getVendorId());
+        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfoById(productCreationDto.getVendorId());
 
         try {
             redisNotificationMessagesManagementService.deleteNotificationMessageAssociatedData(
