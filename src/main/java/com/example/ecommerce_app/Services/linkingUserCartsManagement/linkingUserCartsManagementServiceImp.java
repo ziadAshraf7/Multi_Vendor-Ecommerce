@@ -46,7 +46,7 @@ public class linkingUserCartsManagementServiceImp implements linkingUserCartsMan
     @Override
     @Transactional
     public void linkBetweenSessionCartAndUserCart(String sessionId, long userId) {
-
+        if(sessionService.getSessionData(sessionId) == null) return;
         List<CartItemDto> sessionCartItems = ((AnonymousUserSessionData) sessionService.getSessionData(sessionId)).getCartItems();
         if (sessionCartItems == null) return;
         if (sessionCartItems.isEmpty()) return;
