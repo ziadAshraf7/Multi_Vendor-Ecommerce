@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(Email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2))
+                .setExpiration(new Date(System.currentTimeMillis() + 864000000))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -63,8 +64,7 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    public Boolean validateToken(String token, UserInfoDetails user) {
-        final String email = extractUserEmail(token);
-        return (email.equals(user.getEmail()) && !isTokenExpired(token));
-    }
+    public boolean validateToken(String token) {
+            return !isTokenExpired(token) ;
+}
 }

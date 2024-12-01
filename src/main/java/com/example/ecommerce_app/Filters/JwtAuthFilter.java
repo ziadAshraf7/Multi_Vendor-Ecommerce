@@ -53,7 +53,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String email = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            email = jwtService.extractUserEmail(token);
+            if(jwtService.validateToken(token)){
+                email = jwtService.extractUserEmail(token);
+            }else {
+                return;
+            }
         }
 
 
@@ -69,17 +73,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         userRepository.findByEmail(email)
                 );
                 AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(userInfo.getEmail() , userInfo.getId() , token);
-                if (jwtService.validateToken(token, userInfo)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             authenticatedUserDto,
                             null,
                             userInfo.getAuthorities()
                     );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                }else {
-                    throw new CustomRuntimeException("Token is Invalid");
-                }
 
             }catch (CustomRuntimeException e){
                 throw new CustomRuntimeException("user is not authorized");
