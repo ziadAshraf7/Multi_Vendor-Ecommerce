@@ -24,10 +24,17 @@ public class ProductController {
 
     private final ProductServiceImp productService;
 
-
     private final ProductDisplayServiceImp productDisplayServiceImp;
 
     private final AdminRequestsApprovalService productApprovalService;
+
+
+    @DeleteMapping("/product")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteProduct(@RequestParam long productId){
+        productService.removeProduct(productId);
+        return new ResponseEntity<>("Deleted Successfully" , HttpStatus.CREATED);
+    }
 
 
     @PostMapping("/product")
