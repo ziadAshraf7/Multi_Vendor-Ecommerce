@@ -44,7 +44,7 @@ public class ProductDisplayServiceImp implements ProductDisplayService{
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(authentication != null){
+        if(authentication.getPrincipal() != "anonymousUser"){
             String userEmail =  ((AuthenticatedUserDto) authentication).getEmail();
             UserGeneralInfoInfoView userGeneralInfoInfoView = userRepository.findGeneralInfoByEmail(userEmail);
             if(userGeneralInfoInfoView != null)  displayProduct(productId , userGeneralInfoInfoView.getId());
