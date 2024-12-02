@@ -29,15 +29,15 @@ public class ProductController {
     private final AdminRequestsApprovalService productApprovalService;
 
 
-    @DeleteMapping("/product")
+    @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteProduct(@RequestParam long productId){
+    public ResponseEntity<String> deleteProduct(@PathVariable long productId){
         productService.removeProduct(productId);
         return new ResponseEntity<>("Deleted Successfully" , HttpStatus.CREATED);
     }
 
 
-    @PostMapping("/product")
+    @PostMapping("/pending/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> acceptPendingProductRequest(@ModelAttribute @Valid ProductCreationDto productCreationDto ,
                                                               @ModelAttribute String notificationMessageId) throws IOException {
@@ -45,7 +45,7 @@ public class ProductController {
         return new ResponseEntity<>("Created Successfully" , HttpStatus.CREATED);
     }
 
-    @PutMapping("/product")
+    @PutMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateProduct(@ModelAttribute ProductUpdateDto productUpdateDto){
         productService.updateProduct(productUpdateDto);
