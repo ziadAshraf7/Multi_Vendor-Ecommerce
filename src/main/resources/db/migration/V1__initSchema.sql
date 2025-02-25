@@ -39,7 +39,6 @@ CREATE TABLE product (
 );
 
 
-
 CREATE TABLE user (
     id BIGINT AUTO_INCREMENT,
     user_name VARCHAR(50) NOT NULL,

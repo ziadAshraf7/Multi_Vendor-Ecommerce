@@ -3,6 +3,7 @@ package com.example.ecommerce_app.Entity;
 
 import com.example.ecommerce_app.Entity.Embedded_Ids.OrderItemEmbeddedId;
 import com.example.ecommerce_app.Entity.Enums.OrderItemStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,10 @@ import java.time.LocalDateTime;
 public class OrderItem extends BaseEntity{
 
 
+    public  OrderItem (){
+
+    }
+
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
@@ -33,6 +38,7 @@ public class OrderItem extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY , cascade = CascadeType.PERSIST)
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY , cascade = CascadeType.PERSIST)

@@ -6,5 +6,4 @@ import com.example.ecommerce_app.Dto.OrderItem.OrderItemStatusDto;
 public interface OrderManagementService {
     void makeOrder();
     void changeOrderItemStatus(OrderItemStatusDto orderItemStatusDto);
-
 }

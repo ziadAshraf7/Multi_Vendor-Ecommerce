@@ -60,10 +60,10 @@ public interface ProductMapper {
     ProductDetailedDto toProductDetailedDto(Product product);
 
     @Named("mapToAttributeValuesDetails")
-    default Map<AttributeDto, List<ProductAttributeValueDto>>  mapToAttributeValuesDetails(
+    default Map<String, List<ProductAttributeValueDto>>  mapToAttributeValuesDetails(
             List<ProductAttributeValue> attributeValues){
 
-        Map<AttributeDto, List<ProductAttributeValueDto>> map = new HashMap<>();
+        Map<String, List<ProductAttributeValueDto>> map = new HashMap<>();
 
         attributeValues.forEach(productAttributeValue -> {
             AttributeDto attributeDto = AttributeDto.builder()
@@ -76,7 +76,7 @@ public interface ProductMapper {
                     .value(productAttributeValue.getValue())
                     .build();
 
-            map.compute(attributeDto , (key , value) -> {
+            map.compute(attributeDto.getName() , (key , value) -> {
                 if(value == null) return new ArrayList<>(List.of(productAttributeValueDto));
                 value.add(productAttributeValueDto);
                 return value;

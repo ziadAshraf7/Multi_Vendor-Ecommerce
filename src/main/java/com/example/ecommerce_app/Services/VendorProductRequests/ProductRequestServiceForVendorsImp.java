@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @Service
 @Slf4j
-public class ProductManagementForVendorsServiceImp implements ProductManagementForVendorsService {
+public class ProductRequestServiceForVendorsImp implements ProductRequestServiceForVendors {
 
     private final NotificationService notificationService;
 
@@ -42,9 +42,7 @@ public class ProductManagementForVendorsServiceImp implements ProductManagementF
                     messageId ,
                     productCreationDto
             );
-            System.out.println("dddddddddddddddddddddddddddddddddddddddddd");
             notificationService.sendNotification(productCreationNotificationRequest);
-
         }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Error while sending product adding request");

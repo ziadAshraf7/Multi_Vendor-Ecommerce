@@ -38,7 +38,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @Transactional
-    public ResponseEntity<String> loginUser(@ModelAttribute @Valid LoginDto loginDto , HttpSession httpSession){
+    public ResponseEntity<SuccessfulLoginInfo> loginUser(@ModelAttribute @Valid LoginDto loginDto , HttpSession httpSession){
 
         SuccessfulLoginInfo successfulLoginInfo = authenticationService.loginWithJwt(loginDto);
 
@@ -47,8 +47,7 @@ public class AuthenticationController {
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION_HEADER , "Bearer " + successfulLoginInfo.getJwtToken());
 
-        return new ResponseEntity<>("login Successfully", headers, HttpStatus.OK);
-
+        return new ResponseEntity<>(successfulLoginInfo, headers, HttpStatus.OK);
     }
 
     @PostMapping("/signup")

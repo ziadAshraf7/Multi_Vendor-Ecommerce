@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Parent_Category_Creation_Dto {
+public class ParentCategoryCreationDto {
 
     @NotEmpty(message = "name can't be empty")
     @NotNull(message = "name can't be null ")

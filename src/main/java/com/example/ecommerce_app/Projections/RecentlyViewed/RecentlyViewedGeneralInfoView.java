@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class RecentlyViewedGeneralInfoView {
 
+    private Long productId;
 
     private String productName;
 

@@ -1,8 +1,8 @@
 package com.example.ecommerce_app.Services;
 
-import com.example.ecommerce_app.Dto.Product_Table.Product_Detailed_Dto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Overview_Dto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Update_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductDetailedDto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductOverviewDto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductUpdateDto;
 import com.example.ecommerce_app.Entity.*;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
@@ -72,7 +72,7 @@ public class ProductServiceTest {
     @Test
     void ProductServiceUpdateProductReturnsProductOverviewDto(){
 
-        Product_Update_Dto productUpdateDto = Product_Update_Dto.
+        ProductUpdateDto productUpdateDto = ProductUpdateDto.
                 builder()
                 .productId(10L)
                 .title("newTitle")
@@ -107,17 +107,17 @@ public class ProductServiceTest {
         List<Product> products = new ArrayList<>(List.of(product1, product2));
 
         when(categoryService.getCategoryEntityById(categoryId)).thenReturn(category);
-        when(productRepository.findBySubCategory(category, pageable)).thenReturn(new PageImpl<>(products, pageable, products.size()));
-        when(productMapper.to_Product_Overview_Dto(any(Product.class))).thenReturn(new Product_Overview_Dto());
+        when(productRepository.findBySubCategoryId(category, pageable)).thenReturn(new PageImpl<>(products, pageable, products.size()));
+        when(productMapper.toProductOverviewDto(any(Product.class))).thenReturn(new ProductOverviewDto());
 
         assertDoesNotThrow(() -> {
-            Page<Product_Overview_Dto> result = productService.getProductsByCategoryId(categoryId);
+            Page<ProductOverviewDto> result = productService.getProductsByCategoryId(categoryId);
 
             assertNotNull(result);
             assertEquals(2, result.getTotalElements());
         });
 
-        verify(productMapper, times(products.size())).to_Product_Overview_Dto(any());
+        verify(productMapper, times(products.size())).toProductOverviewDto(any());
 
     }
 
@@ -127,10 +127,10 @@ public class ProductServiceTest {
     void ProductServiceGetProductByIdReturnsProductDetailedDto() {
         long productId = 30L;
         Product product = Product.builder().id(productId).build();
-        Product_Detailed_Dto expectedDto = new Product_Detailed_Dto();
+        ProductDetailedDto expectedDto = new ProductDetailedDto();
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product) );
-        when(productMapper.to_Product_Detailed_Dto(product)).thenReturn(expectedDto);
+        when(productMapper.toProductDetailedDto(product)).thenReturn(expectedDto);
 
         assertDoesNotThrow(() -> productService.getProductById(productId));
     }
@@ -141,14 +141,14 @@ public class ProductServiceTest {
         String productName = "product";
         Product product = Product.builder().name(productName).build();
 
-        Product_Detailed_Dto productDto = new Product_Detailed_Dto();
+        ProductDetailedDto productDto = new ProductDetailedDto();
         productDto.setName(productName);
 
         when(productRepository.findByName(productName)).thenReturn(product);
-        when(productMapper.to_Product_Detailed_Dto(any(Product.class))).thenReturn(productDto);
+        when(productMapper.toProductDetailedDto(any(Product.class))).thenReturn(productDto);
 
         assertDoesNotThrow(() -> {
-            Product_Detailed_Dto productDetailedDto = productService.getProductByName(productName);
+            ProductDetailedDto productDetailedDto = productService.getProductByName(productName);
             assertNotNull(productDetailedDto);
             assertEquals(productDetailedDto.getName() , product.getName());
         });
@@ -165,14 +165,14 @@ public class ProductServiceTest {
         List<Product> products = new ArrayList<>(List.of(product1, product2));
 
         when(productRepository.getFeaturedProducts(categoryId , pageable)).thenReturn(new PageImpl<>(products , pageable , products.size()));
-        when(productMapper.to_Product_Overview_Dto(any(Product.class))).thenReturn(new Product_Overview_Dto());
+        when(productMapper.toProductOverviewDto(any(Product.class))).thenReturn(new ProductOverviewDto());
 
         assertDoesNotThrow(() -> {
-            Page<Product_Overview_Dto> result =  productService.getNewArrivalProducts(categoryId);
+            Page<ProductOverviewDto> result =  productService.getNewArrivalProducts(categoryId);
 
             assertNotNull(result);
             assertEquals(result.getTotalElements() , products.size());
-            verify(productMapper , times(products.size())).to_Product_Overview_Dto(any(Product.class));
+            verify(productMapper , times(products.size())).toProductOverviewDto(any(Product.class));
         });
 
     }
@@ -187,14 +187,14 @@ public class ProductServiceTest {
           List<Product> products = new ArrayList<>(List.of(product1, product2));
 
           when(productRepository.getDiscountProducts(categoryId , pageable)).thenReturn(new PageImpl<>(products , pageable , products.size()));
-          when(productMapper.to_Product_Overview_Dto(any(Product.class))).thenReturn(new Product_Overview_Dto());
+          when(productMapper.toProductOverviewDto(any(Product.class))).thenReturn(new ProductOverviewDto());
 
           assertDoesNotThrow(() -> {
-              Page<Product_Overview_Dto> result =  productService.getDiscountProducts(categoryId);
+              Page<ProductOverviewDto> result =  productService.getDiscountProducts(categoryId);
 
               assertNotNull(result);
               assertEquals(result.getTotalElements() , products.size());
-              verify(productMapper , times(products.size())).to_Product_Overview_Dto(any(Product.class));
+              verify(productMapper , times(products.size())).toProductOverviewDto(any(Product.class));
       });
 
     }
@@ -227,14 +227,14 @@ public class ProductServiceTest {
         List<Product> products = new ArrayList<>(List.of(product1, product2));
 
         when(productRepository.findByBrandId(brandId , pageable)).thenReturn(new PageImpl<>(products , pageable , products.size()));
-        when(productMapper.to_Product_Overview_Dto(any(Product.class))).thenReturn(new Product_Overview_Dto());
+        when(productMapper.toProductOverviewDto(any(Product.class))).thenReturn(new ProductOverviewDto());
 
         assertDoesNotThrow(() -> {
-            Page<Product_Overview_Dto> result =  productService.getProductsPerBrand(brandId);
+            Page<ProductOverviewDto> result =  productService.getProductsPerBrand(brandId);
 
             assertNotNull(result);
             assertEquals(result.getTotalElements() , products.size());
-            verify(productMapper , times(products.size())).to_Product_Overview_Dto(any(Product.class));
+            verify(productMapper , times(products.size())).toProductOverviewDto(any(Product.class));
         });
     }
 
@@ -253,7 +253,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("product not found exception")
     void ProductServiceUpdateProductThrowsCustomNotFoundExceptionWhenProductNotFound(){
-        Product_Update_Dto productUpdateDto = Product_Update_Dto.builder().productId(1L).build();
+        ProductUpdateDto productUpdateDto = ProductUpdateDto.builder().productId(1L).build();
 
         when(productRepository.findById(1L)).thenThrow(new CustomNotFoundException("Unable to find Product with Id " + 1L));
 
@@ -269,7 +269,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("product not found exception")
     void ProductServiceUpdateProductThrowsDatabasePersistenceException(){
-        Product_Update_Dto productUpdateDto = Product_Update_Dto.builder().productId(10L).build();
+        ProductUpdateDto productUpdateDto = ProductUpdateDto.builder().productId(10L).build();
 
         when(productRepository.findById(10L)).thenReturn(Optional.of(product));
         when(productRepository.save(any(Product.class))).thenThrow(new DatabasePersistenceException("Unable to update Product with id 10"));
@@ -279,7 +279,7 @@ public class ProductServiceTest {
         });
 
         assertEquals(exception.getMessage() , "Unable to update Product with id 10");
-        verify(productMapper , never()).to_Product_Overview_Dto(any(Product.class));
+        verify(productMapper , never()).toProductOverviewDto(any(Product.class));
     }
 
     @Test
@@ -291,7 +291,7 @@ public class ProductServiceTest {
         CustomNotFoundException exception =  assertThrows(CustomNotFoundException.class , () -> productService.getProductsByCategoryId(1));
 
         assertEquals(exception.getMessage() , "Unable to find category with category id " + 1);
-        verify(productRepository , never()).findBySubCategory(any(Category.class) , any(Pageable.class));
+        verify(productRepository , never()).findBySubCategoryId(any(Category.class) , any(Pageable.class));
 
     }
 
@@ -305,7 +305,7 @@ public class ProductServiceTest {
         CustomNotFoundException exception =  assertThrows(CustomNotFoundException.class , () -> productService.getProductById(1));
 
         assertEquals(exception.getMessage() , "Unable to find Product with Id " + 1);
-        verify(productMapper , never()).to_Product_Detailed_Dto(any());
+        verify(productMapper , never()).toProductDetailedDto(any());
 
     }
 
@@ -347,7 +347,7 @@ public class ProductServiceTest {
                 () -> productService.getProductByName("product"));
 
         assertEquals(exception.getMessage() , "Unable to find product name product");
-        verify(productMapper , never()).to_Product_Detailed_Dto(any());
+        verify(productMapper , never()).toProductDetailedDto(any());
 
     }
 

@@ -4,6 +4,7 @@ import com.example.ecommerce_app.Dto.CategoryAttributeManagement.SubCategoryAttr
 import com.example.ecommerce_app.Dto.CategoryAttributeManagement.SubCategoryWithAttributeDto;
 import com.example.ecommerce_app.Entity.Attribute;
 import com.example.ecommerce_app.Entity.Category;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabaseInternalServerError;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Repositery.Attribute.AttributeRepository;
@@ -40,6 +41,8 @@ public class CategoryAttributeManagementServiceImp implements CategoryAttributeM
 
             Attribute attribute = attributeService.getAttributeEntityById(subCategoryWithAttributeDto.getAttributeId());
 
+            if(attribute.getSubCategories().contains(subCategory)) throw new CustomBadRequestException("attribute is already linked with category");
+
             attribute.addNewSubCategory(subCategory);
 
         try {
@@ -72,9 +75,9 @@ public class CategoryAttributeManagementServiceImp implements CategoryAttributeM
 
     @Transactional(readOnly = true)
     @Override
-    public SubCategoryAttributeResponseDto getSubCategoryAttributesNames(SubCategoryWithAttributeDto subCategoryWithAttributeDto) {
+    public SubCategoryAttributeResponseDto getSubCategoryAttributesNames(long categoryId ) {
 
-            Category subCategory = categoryService.getSubCategoryEntityById(subCategoryWithAttributeDto.getSubCategoryId());
+            Category subCategory = categoryService.getSubCategoryEntityById(categoryId);
 
             Set<Attribute> attributes = subCategory.getSubCategoryAttributes();
 

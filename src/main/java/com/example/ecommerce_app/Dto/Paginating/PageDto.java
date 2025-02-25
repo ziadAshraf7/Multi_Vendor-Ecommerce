@@ -12,5 +12,5 @@ public class PageDto {
     }
 
     private int pageNumber;
-    private int pageSize = 20;
+    private int pageSize;
 }

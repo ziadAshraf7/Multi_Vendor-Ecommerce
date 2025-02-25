@@ -18,11 +18,12 @@ public interface OrderItemRepository extends JpaRepository<OrderItem , Long> {
 
     Page<OrderItem> findByVendorId(long vendorId , Pageable pageable);
 
+    List<OrderItem> findByOrderId(long orderId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM OrderItem oi WHERE oi.order.id = :orderId AND oi.product.id = :productId")
     void deleteByOrderIdAndProductId(@Param("orderId") long orderId, @Param("productId") long productId);
-
 
     @Query("SELECT oi FROM OrderItem oi WHERE oi.order.id = :orderId AND oi.product.id = :productId")
     OrderItem findByOrderIdAndProductId(@Param("orderId") long orderId ,@Param("productId") long productId);

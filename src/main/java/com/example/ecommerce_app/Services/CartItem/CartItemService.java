@@ -18,5 +18,5 @@ public interface CartItemService {
 
     void removeFromCart(RemoveFromCartDto removeFromCartDto);
 
-    void removeAllFromCart(long customerId);
+    void removeAllFromCart(long userId);
 }

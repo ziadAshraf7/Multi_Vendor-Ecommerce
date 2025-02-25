@@ -17,6 +17,12 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionsHandler {
 
+    @ExceptionHandler(CustomAuthorizationException.class)
+    public ResponseEntity<ErrorResponse> handleCustomAuthorizationException(CustomAuthorizationException ex) {
+        return new ResponseEntity<>(
+                new ErrorResponse(ex.getMessage() , HttpStatus.UNAUTHORIZED.value()) , HttpStatus.UNAUTHORIZED
+        );
+    }
     @ExceptionHandler(CustomConflictException.class)
     public ResponseEntity<ErrorResponse> handleCustomConflictException(CustomConflictException ex) {
         return new ResponseEntity<>(

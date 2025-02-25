@@ -11,9 +11,12 @@ import lombok.NoArgsConstructor;
 @Data
 public class OrderItemStatusDto {
 
+    @NotNull
     private OrderItemStatus orderItemStatus;
 
+    @NotNull
     private long orderItemId;
 
+    @NotNull
     private long vendorProductId;
 }

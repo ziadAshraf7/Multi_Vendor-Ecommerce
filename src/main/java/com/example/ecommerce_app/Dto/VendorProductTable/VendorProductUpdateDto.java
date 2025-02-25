@@ -15,4 +15,6 @@ public class VendorProductUpdateDto {
 
     private double price;
 
+    private double discount;
+
 }

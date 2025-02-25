@@ -2,6 +2,7 @@ package com.example.ecommerce_app.Filters;
 
 import com.example.ecommerce_app.Dto.AutheticatedUser.AuthenticatedUserDto;
 import com.example.ecommerce_app.Dto.User.UserInfoDetails;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomAuthorizationException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Mapper.UserMapper;
 import com.example.ecommerce_app.Redis.Session.SessionManagement.SessionService;
@@ -55,8 +56,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             token = authHeader.substring(7);
             if(jwtService.validateToken(token)){
                 email = jwtService.extractUserEmail(token);
-            }else {
-                return;
             }
         }
 
@@ -68,35 +67,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         boolean isTokenBlackListed = Objects.requireNonNull(redisTemplate.opsForList().range(tokenBlackListRedisKey, 0, 1)).contains(token);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null && !isTokenBlackListed) {
-            try {
                 UserInfoDetails userInfo = userMapper.toUserInfoDetails(
                         userRepository.findByEmail(email)
                 );
-                AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(userInfo.getEmail() , userInfo.getId() , token);
-
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            authenticatedUserDto,
-                            null,
-                            userInfo.getAuthorities()
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            UsernamePasswordAuthenticationToken authToken = getUsernamePasswordAuthenticationToken(userInfo, token);
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            }catch (CustomRuntimeException e){
-                throw new CustomRuntimeException("user is not authorized");
-            }
-
+                    
         }
 
         filterChain.doFilter(request, response);
     }
 
+    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(UserInfoDetails userInfo, String token) {
+        if (userInfo == null) throw new CustomAuthorizationException("user is not authorized");
+        AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(userInfo.getUserRole() , userInfo.getEmail() , userInfo.getId() , token);
+
+        return new UsernamePasswordAuthenticationToken(
+                    authenticatedUserDto,
+                    null,
+                    userInfo.getAuthorities()
+            );
+    }
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        String httpMethod = request.getMethod();
-
-        return requestUri.startsWith("/api/public") &
-                !(pathMatcher.match("/api/public/product", requestUri) && "GET".equals(httpMethod));
+        return false;
     }
 }

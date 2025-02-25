@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class RemoveFromCartDto {
 
-
     private long productId;
 
     private long vendorProductId;

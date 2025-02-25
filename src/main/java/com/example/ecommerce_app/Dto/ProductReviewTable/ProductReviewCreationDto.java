@@ -20,9 +20,6 @@ public class ProductReviewCreationDto {
     @NotNull(message = "product id cannot be null")
     private long productId;
 
-    @NotNull(message = "user id cannot be null")
-    private long userId;
-
     @NotNull(message = "rate cannot be null")
     @DecimalMin(value = "0.5")
     @DecimalMax(value = "5.0")

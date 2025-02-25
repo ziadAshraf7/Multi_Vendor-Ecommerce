@@ -1,21 +1,17 @@
 package com.example.ecommerce_app.Services;
 
-import com.example.ecommerce_app.Dto.Attribute_Table.AttributeDto;
-import com.example.ecommerce_app.Dto.Product_Table.Product_Creation_Dto;
+import com.example.ecommerce_app.Dto.Product_Table.ProductCreationDto;
 import com.example.ecommerce_app.Entity.*;
-import com.example.ecommerce_app.Entity.Embedded_Ids.Vendor_Product_EmbeddedId;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
-import com.example.ecommerce_app.Mapper.ProductMapper;
-import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.ProductAttributeValue.ProductAttributeValueRepository;
-import com.example.ecommerce_app.Repositery.Vendor_Product.Vendor_Product_Repository;
-import com.example.ecommerce_app.Repositery.Vendor_Product_Image.Vendor_Product_Image_Repository;
+import com.example.ecommerce_app.Repositery.Vendor_Product.VendorProductRepository;
+import com.example.ecommerce_app.Repositery.Vendor_Product_Image.vendorProductImageRepository;
 import com.example.ecommerce_app.Services.Brand.BrandService;
 import com.example.ecommerce_app.Services.Category.CategoryService;
-import com.example.ecommerce_app.Services.Product_Mangement.ProductManagementServiceImp;
+import com.example.ecommerce_app.Services.ProductManagement.ProductManagementServiceImp;
 import com.example.ecommerce_app.Services.User.UserServiceImp;
 import com.example.ecommerce_app.Utills.Interfaces.UserRoles;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +46,7 @@ public class ProductManagementServiceTest {
     private CategoryService categoryService;
 
     @Mock
-    private  Vendor_Product_Repository vendor_product_repository;
+    private VendorProductRepository vendor_product_repository;
 
     @Mock
     private  UserServiceImp userServiceImp;
@@ -59,7 +55,7 @@ public class ProductManagementServiceTest {
     private ProductAttributeValueRepository productAttributeValueRepository;
 
     @Mock
-    private  Vendor_Product_Image_Repository vendor_product_image_repository;
+    private vendorProductImageRepository vendor_product_image_repository;
 
     @InjectMocks
     private ProductManagementServiceImp productManagementService;
@@ -73,7 +69,7 @@ public class ProductManagementServiceTest {
 
     private MultipartFile mockThumbNail;
 
-    private Product_Creation_Dto productCreationDto;
+    private ProductCreationDto productCreationDto;
 
     private Product product;
 
@@ -88,13 +84,13 @@ public class ProductManagementServiceTest {
 
         mockThumbNail = mock(MultipartFile.class);
 
-        productCreationDto = Product_Creation_Dto
+        productCreationDto = ProductCreationDto
                 .builder()
                 .brandId(1L)
                 .thumbNail( mockThumbNail)
                 .subCategoryId(1L)
                 .vendorId(1L)
-                .productAttributesWithValues(Map.of(AttributeDto.builder().name("MoDel").attributeId(1L).build() , List.of("458bca")))
+                .productAttributesWithValues(Map.of())
                 .imageFiles(List.of(mockThumbNail))
                 .build();
 
@@ -108,9 +104,9 @@ public class ProductManagementServiceTest {
     @DisplayName("Persisting Product Entity with Linking with a Vendor and Adding Product Images and Attributes attached values ")
     void ProductManagementServiceAddProductReturnsVoid() throws IOException {
 
-        Vendor_Product vendor_product = Vendor_Product.builder().id(new Vendor_Product_EmbeddedId()).product(product).vendor(vendor).stock(5).price(50.0).build();
+        VendorProduct vendor_product = VendorProduct.builder().product(product).vendor(vendor).stock(5).price(50.0).build();
 
-        List<Vendor_Product_Image> vendorProductImages = new ArrayList<>(List.of(Vendor_Product_Image.builder()
+        List<vendorProductImage> vendorProductImages = new ArrayList<>(List.of(vendorProductImage.builder()
                 .vendor(vendor)
                 .id(1L)
                 .product(product)
@@ -129,7 +125,7 @@ public class ProductManagementServiceTest {
         when(productAttributeValueRepository.saveAll(anyList())).thenReturn(attributeValues);
         when(userServiceImp.getUserEntityById(1L , UserRoles.ROLE_VENDOR)).thenReturn(vendor);
         when(productRepository.save(any(Product.class))).thenReturn(product);
-        when(vendor_product_repository.save(any(Vendor_Product.class))).thenReturn(vendor_product);
+        when(vendor_product_repository.save(any(VendorProduct.class))).thenReturn(vendor_product);
         when(vendor_product_image_repository.saveAll(anyList())).thenReturn(vendorProductImages);
 
 
@@ -143,7 +139,7 @@ public class ProductManagementServiceTest {
         verify(userServiceImp).getUserEntityById(1L, UserRoles.ROLE_VENDOR);
         verify(productAttributeValueRepository).saveAll(anyList());
         verify(productRepository).save(any(Product.class));
-        verify(vendor_product_repository).save(any(Vendor_Product.class) );
+        verify(vendor_product_repository).save(any(VendorProduct.class) );
         verify(vendor_product_image_repository).saveAll(anyList());
     }
 
@@ -241,7 +237,7 @@ public class ProductManagementServiceTest {
     void ProductManagementServiceAddProductThrowsDatabasePersistenceExceptionWhenPersistVendorProduct()   {
 
         when(productRepository.save(any(Product.class))).thenReturn(product);
-        when(vendor_product_repository.save(any(Vendor_Product.class))).thenThrow(new DatabasePersistenceException("Unable to link the product with the vendor"));
+        when(vendor_product_repository.save(any(VendorProduct.class))).thenThrow(new DatabasePersistenceException("Unable to link the product with the vendor"));
 
         DatabasePersistenceException exception =  assertThrows(DatabasePersistenceException.class
                 , () -> productManagementService.addProduct(productCreationDto));
@@ -261,16 +257,15 @@ public class ProductManagementServiceTest {
     @DisplayName("persisting vendor_product_image entity in the database exceptions")
     void ProductManagementServiceAddProductThrowsDatabasePersistenceExceptionWhenPersistVendorProductImage()   {
 
-          Vendor_Product vendorProduct = Vendor_Product
+          VendorProduct vendorProduct = VendorProduct
                 .builder()
-                .id(new Vendor_Product_EmbeddedId())
                 .vendor(vendor)
                 .product(product)
                 .stock(50)
                 .build();
 
         when(productRepository.save(any(Product.class))).thenReturn(product);
-        when(vendor_product_repository.save(any(Vendor_Product.class))).thenReturn(vendorProduct);
+        when(vendor_product_repository.save(any(VendorProduct.class))).thenReturn(vendorProduct);
         when(vendor_product_image_repository.saveAll(anyList())).thenThrow(new DatabasePersistenceException("Unable to add Images for the Product"));
 
         DatabasePersistenceException exception =  assertThrows(DatabasePersistenceException.class
@@ -279,7 +274,7 @@ public class ProductManagementServiceTest {
         assertEquals(exception.getMessage() , "Unable to add Images for the Product");
 
         verify(productRepository , times(1)).save(any(Product.class));
-        verify(vendor_product_repository).save(any(Vendor_Product.class));
+        verify(vendor_product_repository).save(any(VendorProduct.class));
         verify(brandService , times(1)).getBrandEntityById(1L);
         verify(categoryService , times(1)).getSubCategoryEntityById(1L);
         verify(userServiceImp , times(1)).getUserEntityById(1L , UserRoles.ROLE_VENDOR);

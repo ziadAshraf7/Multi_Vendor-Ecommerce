@@ -46,7 +46,7 @@ public class ProductDetailedDto {
 
     private List<ProductReview_Detailed_Dto> reviewsDtos;
 
-    private Map<AttributeDto , List<ProductAttributeValueDto>> attributeDtoListMap;
+    private Map<String , List<ProductAttributeValueDto>> attributeDtoListMap;
 
     private  List<String> imageFilesName;
 

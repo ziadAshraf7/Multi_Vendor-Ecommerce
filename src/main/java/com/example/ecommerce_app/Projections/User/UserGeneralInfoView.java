@@ -6,7 +6,7 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class UserGeneralInfoInfoView {
+public class UserGeneralInfoView {
 
     long Id;
 

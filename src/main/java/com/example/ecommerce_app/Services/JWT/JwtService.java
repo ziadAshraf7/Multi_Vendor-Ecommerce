@@ -1,9 +1,8 @@
 package com.example.ecommerce_app.Services.JWT;
 
 import com.example.ecommerce_app.Dto.User.UserInfoDetails;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.example.ecommerce_app.Exceptions.Exceptions.CustomAuthorizationException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -53,11 +52,11 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSignKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -65,6 +64,17 @@ public class JwtService {
     }
 
     public boolean validateToken(String token) {
-            return !isTokenExpired(token) ;
+        try {
+            return !isTokenExpired(token);
+        } catch (ExpiredJwtException ex) {
+            System.out.println("Token has expired: ");
+            throw new CustomAuthorizationException("JWT Expired");
+        } catch (JwtException ex) { // Catch all JWT-related exceptions
+            System.out.println("Invalid JWT: " + ex.getMessage());
+            throw new CustomAuthorizationException("Invalid JWT");
+        } catch (Exception ex) { // Catch any other unexpected exceptions
+            System.out.println("Unexpected error: " + ex.getMessage());
+            throw new CustomAuthorizationException("Internal Server Error");
+        }
 }
 }

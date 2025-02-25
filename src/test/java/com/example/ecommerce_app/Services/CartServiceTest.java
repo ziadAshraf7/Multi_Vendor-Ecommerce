@@ -48,7 +48,6 @@ class CartServiceTest {
                 .builder()
                 .customerId(1L)
                 .customer(customer)
-                .totalPrice(0)
                 .build();
     }
 
@@ -75,7 +74,7 @@ class CartServiceTest {
 
     @Test
     void CartServicePersistCartEntityReturnCartEntity(){
-        Cart cartEntity = Cart.builder().totalPrice(0.0).build();
+        Cart cartEntity = Cart.builder().build();
         assertDoesNotThrow(() -> cartService.persistCartEntity(cart));
     }
 

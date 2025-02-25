@@ -9,5 +9,5 @@ public interface CategoryAttributeManagementService {
 
     void unLinkSubCategoryAndAttribute(SubCategoryWithAttributeDto subCategoryWithAttributeDto);
 
-    SubCategoryAttributeResponseDto getSubCategoryAttributesNames(SubCategoryWithAttributeDto subCategoryWithAttributeDto);
+    SubCategoryAttributeResponseDto getSubCategoryAttributesNames(long categoryId );
 }

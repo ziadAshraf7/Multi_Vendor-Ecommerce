@@ -9,11 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class OrderResponseDto {
-
     private String customerName;
 
-    private OrderItemStatus status ;
-
     private double totalAmount ;
-
 }

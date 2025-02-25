@@ -1,5 +1,6 @@
 package com.example.ecommerce_app.Controller;
 
+import com.example.ecommerce_app.Dto.AutheticatedUser.AuthenticatedUserDto;
 import com.example.ecommerce_app.Dto.CartItem.*;
 import com.example.ecommerce_app.Services.AnonymousUserServices.AnonymousUserCart.AnonymousCartService;
 import com.example.ecommerce_app.Services.CartItem.CartItemService;
@@ -30,7 +31,7 @@ public class CartController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(authentication != null){
+        if(authentication.getPrincipal() != "anonymousUser"){
             cartItemService.modifyCartItemQuantity(cartItemQuantityDto);
         }else {
             anonymousCartService.modifyCartItemQuantity(cartItemQuantityDto , httpSession.getId());
@@ -64,7 +65,7 @@ public class CartController {
     }
 
     @DeleteMapping("/cartItem")
-    public ResponseEntity<String> removeFromCart(RemoveFromCartDto removeFromCartDto , HttpSession httpSession){
+    public ResponseEntity<String> removeFromCart(@RequestBody RemoveFromCartDto removeFromCartDto , HttpSession httpSession){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if(authentication.getPrincipal() != "anonymousUser"){
@@ -76,16 +77,15 @@ public class CartController {
         return ResponseEntity.ok("Removed From Cart Successfully");
     }
 
-    @DeleteMapping("/cart")
-    public ResponseEntity<String> removeAllFromCart(@RequestParam Long customerId , HttpSession httpSession){
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> removeAllFromCart(HttpSession httpSession){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if(authentication.getPrincipal() != "anonymousUser"){
-            cartItemService.removeAllFromCart(customerId);
+            cartItemService.removeAllFromCart(( (AuthenticatedUserDto) authentication.getPrincipal()).getId());
         }else {
             anonymousCartService.removeAllFromCart(httpSession.getId());
         }
-
         return ResponseEntity.ok("All Removed From Cart Successfully");
     }
 

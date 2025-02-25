@@ -1,5 +1,6 @@
 package com.example.ecommerce_app.Services.ProductReview;
 
+import com.example.ecommerce_app.Dto.AutheticatedUser.AuthenticatedUserDto;
 import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReviewCreationDto;
 import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Detailed_Dto;
 import com.example.ecommerce_app.Dto.ProductReviewTable.ProductReview_Update_Dto;
@@ -10,15 +11,14 @@ import com.example.ecommerce_app.Exceptions.Exceptions.CustomBadRequestException
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.ProductReview_Mapper;
-import com.example.ecommerce_app.Projections.User.UserGeneralInfoInfoView;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.ProductReview.ProductReviewRepository;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
-import com.example.ecommerce_app.Services.Product.ProductService;
-import com.example.ecommerce_app.Services.User.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,10 +81,11 @@ public class ProductReviewServiceImp implements ProductReviewService{
     @Override
     @Transactional
     public void addReview(ProductReviewCreationDto productReviewCreationDto) {
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        long userId = ( (AuthenticatedUserDto) authentication.getPrincipal()).getId();
         if(productReviewRepository.getReviewsCountPerUser(
                 productReviewCreationDto.getProductId() ,
-                productReviewCreationDto.getUserId()
+                userId
         ) > 0) throw new CustomBadRequestException("User cannot have multiple reviews per product ");
 
         boolean isProductExists = productRepository.existsById(productReviewCreationDto.getProductId());
@@ -93,9 +94,9 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
         Product product = productRepository.getReferenceById(productReviewCreationDto.getProductId());
 
-        boolean isUserExists = userRepository.existsById(productReviewCreationDto.getUserId());
+        boolean isUserExists = userRepository.existsById(userId);
         if(!isUserExists) throw new CustomNotFoundException("User is not Found");
-        User user = userRepository.getReferenceById(productReviewCreationDto.getUserId());
+        User user = userRepository.getReferenceById(userId);
 
         ProductReview productReview = productReviewMapper.fromCreationDtoToEntity(productReviewCreationDto);
 
@@ -114,7 +115,9 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
     @Override
     @Transactional
-    public void removeReview(long userId, long productId) {
+    public void removeReview(long productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        long userId = ( (AuthenticatedUserDto) authentication.getPrincipal()).getId();
         try {
             productReviewRepository.deleteProductReview(productId , userId);
         }catch (RuntimeException e){
@@ -125,18 +128,14 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
     @Override
     @Transactional
-    public ProductReview_Detailed_Dto updateReview(ProductReview_Update_Dto productReview_update_dto) throws IOException {
-        ProductReview productReview;
-        try {
-             productReview = productReviewRepository.findByProductIdAndUserId(
-                    productReview_update_dto.getProductId() ,
-                    productReview_update_dto.getUserId()
-            );
-          }catch (RuntimeException e){
-                log.error(e.getMessage());
-                throw new CustomNotFoundException("unable to find the review");
-        }
+    public ProductReview_Detailed_Dto updateReview(ProductReview_Update_Dto productReview_update_dto)  {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        long userId = ( (AuthenticatedUserDto) authentication.getPrincipal()).getId();
 
+        ProductReview productReview = productReviewRepository.findByProductIdAndUserId(
+                    productReview_update_dto.getProductId() , userId);
+
+        if(productReview == null) throw new CustomNotFoundException("user review is not found");
         if(productReview_update_dto.getRate() != null) productReview.setRate(productReview_update_dto.getRate());
         if(productReview_update_dto.getDescription() != null) productReview.setDescription(productReview_update_dto.getDescription());
         if(productReview_update_dto.getImage() != null) productReview.setImageFileName(productReview_update_dto.getImage().getOriginalFilename());
@@ -163,7 +162,7 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
             return productReview_detailed_dtos;
 
-        }catch (RuntimeException e){
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Unable to retrieve reviews");
         }
@@ -181,7 +180,7 @@ public class ProductReviewServiceImp implements ProductReviewService{
 
             return productReview_detailed_dtos;
 
-        }catch (RuntimeException e){
+        }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Unable to retrieve reviews");
         }

@@ -2,11 +2,10 @@ package com.example.ecommerce_app.Services.Category;
 
 
 import com.example.ecommerce_app.Dto.Category_Table.CategoryUpdateDto;
-import com.example.ecommerce_app.Dto.Category_Table.Parent_Category_Creation_Dto;
-import com.example.ecommerce_app.Dto.Category_Table.Sub_Category_Creation_Dto;
+import com.example.ecommerce_app.Dto.Category_Table.ParentCategoryCreationDto;
+import com.example.ecommerce_app.Dto.Category_Table.SubCategoryCreationDto;
 import com.example.ecommerce_app.Entity.Category;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
-import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Mapper.CategoryMapper;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -31,8 +31,13 @@ public class CategoryServiceImp implements CategoryService {
 
     private final FileSystemStorageService fileSystemStorageService;
 
+    @Override
+    public List<Category> getSubCategories() {
+        return categoryRepository.findAllSubCategories();
+    }
+
     @Transactional
-    public void addParentCategory(Parent_Category_Creation_Dto parentCategoryCreationDto) throws IOException {
+    public void addParentCategory(ParentCategoryCreationDto parentCategoryCreationDto) throws IOException {
         Category existingCategoryByName = getCategoryEntityByName(parentCategoryCreationDto.getName());
         if(existingCategoryByName != null) throw new CustomConflictException("Category with name " + parentCategoryCreationDto.getName() + " is already exists" );
 
@@ -49,7 +54,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Transactional
-    public void addSubCategory(Sub_Category_Creation_Dto subCategoryCreationDto) throws IOException {
+    public void addSubCategory(SubCategoryCreationDto subCategoryCreationDto) throws IOException {
             Category existingCategoryByName = getCategoryEntityByName(subCategoryCreationDto.getName());
             if(existingCategoryByName != null) throw new CustomConflictException("Category with name " + subCategoryCreationDto.getName() + " is already exists" );
 
@@ -132,7 +137,7 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     public void deleteCategoryById(long categoryId) {
         Category category = getCategoryEntityById(categoryId);
-        fileSystemStorageService.deleteImageFile(category.getImageFileName());
+//        fileSystemStorageService.deleteImageFile(category.getImageFileName());
         try {
             categoryRepository.deleteById(category.getId());
         }catch (DatabasePersistenceException e){

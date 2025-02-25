@@ -1,17 +1,20 @@
 package com.example.ecommerce_app.Services.Category;
 
 import com.example.ecommerce_app.Dto.Category_Table.CategoryUpdateDto;
-import com.example.ecommerce_app.Dto.Category_Table.Parent_Category_Creation_Dto;
-import com.example.ecommerce_app.Dto.Category_Table.Sub_Category_Creation_Dto;
+import com.example.ecommerce_app.Dto.Category_Table.ParentCategoryCreationDto;
+import com.example.ecommerce_app.Dto.Category_Table.SubCategoryCreationDto;
 import com.example.ecommerce_app.Entity.Category;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface CategoryService {
 
-    void addParentCategory(Parent_Category_Creation_Dto parentCategoryCreationDto) throws IOException;
+    List<Category> getSubCategories();
 
-    void addSubCategory(Sub_Category_Creation_Dto subCategoryCreationDto) throws IOException;
+    void addParentCategory(ParentCategoryCreationDto parentCategoryCreationDto) throws IOException;
+
+    void addSubCategory(SubCategoryCreationDto subCategoryCreationDto) throws IOException;
 
     Category getSubCategoryEntityById(long categoryId);
 

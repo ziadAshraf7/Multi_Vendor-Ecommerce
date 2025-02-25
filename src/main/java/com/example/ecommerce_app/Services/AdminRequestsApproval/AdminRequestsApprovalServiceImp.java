@@ -4,7 +4,7 @@ package com.example.ecommerce_app.Services.AdminRequestsApproval;
 import com.example.ecommerce_app.Dto.ProductRejectionRequest.ProductRejectionRequestDto;
 import com.example.ecommerce_app.Dto.Product_Table.ProductCreationDto;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomRuntimeException;
-import com.example.ecommerce_app.Projections.User.UserGeneralInfoInfoView;
+import com.example.ecommerce_app.Projections.User.UserGeneralInfoView;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
 import com.example.ecommerce_app.Services.NotificationService.DataModel.PendingProductApprovalNotificationMessage;
 import com.example.ecommerce_app.Services.NotificationService.DataModel.ProductApprovalStatus;
@@ -40,7 +40,7 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
     @Override
     public void rejectProduct(ProductRejectionRequestDto productRejectionRequestDto)  {
 
-        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfoById(productRejectionRequestDto.getVendorId());
+        UserGeneralInfoView vendor = userRepository.findGeneralInfoById(productRejectionRequestDto.getVendorId());
 
        try {
 
@@ -67,7 +67,7 @@ public class AdminRequestsApprovalServiceImp implements AdminRequestsApprovalSer
     @Transactional
     @Override
     public void acceptProduct(ProductCreationDto productCreationDto , String notificationMessageId) throws IOException {
-        UserGeneralInfoInfoView vendor = userRepository.findGeneralInfoById(productCreationDto.getVendorId());
+        UserGeneralInfoView vendor = userRepository.findGeneralInfoById(productCreationDto.getVendorId());
 
         try {
             redisNotificationMessagesManagementService.deleteNotificationMessageAssociatedData(

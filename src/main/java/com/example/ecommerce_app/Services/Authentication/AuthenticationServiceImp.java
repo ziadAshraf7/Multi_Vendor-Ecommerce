@@ -56,7 +56,7 @@ public class AuthenticationServiceImp implements AuthenticationService{
 
         String token = jwtService.generateToken(loginDto.getEmail());
 
-        AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(user.getEmail() , user.getId() , token);
+        AuthenticatedUserDto authenticatedUserDto = new AuthenticatedUserDto(user.getUserRole().toString() , user.getEmail() , user.getId() , token);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 authenticatedUserDto  ,

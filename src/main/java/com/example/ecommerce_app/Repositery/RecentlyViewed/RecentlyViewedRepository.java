@@ -16,7 +16,7 @@ import java.util.List;
 public interface RecentlyViewedRepository extends JpaRepository<RecentlyViewed , RecentlyViewedEmbeddedId> {
 
     @Query("""
-      SELECT new com.example.ecommerce_app.Projections.RecentlyViewed.RecentlyViewedGeneralInfoView(rv.product.name , rv.product.thumbNail , rv.product.title)
+      SELECT new com.example.ecommerce_app.Projections.RecentlyViewed.RecentlyViewedGeneralInfoView(rv.product.id , rv.product.name , rv.product.thumbNail , rv.product.title)
       FROM RecentlyViewed rv
       WHERE rv.user.id = :userId
     """)
@@ -24,7 +24,7 @@ public interface RecentlyViewedRepository extends JpaRepository<RecentlyViewed ,
             @Param("userId") long userId);
 
     @Query("""
-      SELECT new com.example.ecommerce_app.Projections.RecentlyViewed.RecentlyViewedGeneralInfoView(rv.product.name , rv.product.thumbNail , rv.product.title)
+      SELECT new com.example.ecommerce_app.Projections.RecentlyViewed.RecentlyViewedGeneralInfoView(rv.product.id , rv.product.name , rv.product.thumbNail , rv.product.title)
       FROM RecentlyViewed rv
       WHERE rv.user.id = :userId And rv.product.id = :productId
     """)

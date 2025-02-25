@@ -18,7 +18,6 @@ import java.util.*;
 @AllArgsConstructor
 public class Category extends BaseEntity {
 
-
     public Category(){
         super();
     }
@@ -41,8 +40,7 @@ public class Category extends BaseEntity {
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
-
-    @OneToMany(mappedBy = "parentCategory")
+    @OneToMany(mappedBy = "parentCategory" , cascade = {CascadeType.REMOVE} , orphanRemoval = true)
     @JsonIgnore
     private final List<Category> subCategories = new ArrayList<>();
 

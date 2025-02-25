@@ -9,7 +9,7 @@ import com.example.ecommerce_app.Entity.User;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Mapper.ProductMapper;
 import com.example.ecommerce_app.Projections.RecentlyViewed.RecentlyViewedGeneralInfoView;
-import com.example.ecommerce_app.Projections.User.UserGeneralInfoInfoView;
+import com.example.ecommerce_app.Projections.User.UserGeneralInfoView;
 import com.example.ecommerce_app.Repositery.Product.ProductRepository;
 import com.example.ecommerce_app.Repositery.RecentlyViewed.RecentlyViewedRepository;
 import com.example.ecommerce_app.Repositery.User.UserRepository;
@@ -45,9 +45,9 @@ public class ProductDisplayServiceImp implements ProductDisplayService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if(authentication.getPrincipal() != "anonymousUser"){
-            String userEmail =  ((AuthenticatedUserDto) authentication).getEmail();
-            UserGeneralInfoInfoView userGeneralInfoInfoView = userRepository.findGeneralInfoByEmail(userEmail);
-            if(userGeneralInfoInfoView != null)  displayProduct(productId , userGeneralInfoInfoView.getId());
+            String userEmail =  ((AuthenticatedUserDto) authentication.getPrincipal()).getEmail();
+            UserGeneralInfoView userGeneralInfoView = userRepository.findGeneralInfoByEmail(userEmail);
+            if(userGeneralInfoView != null)  displayProduct(productId , userGeneralInfoView.getId());
         }
         product.setViewsCount(product.getViewsCount() + 1);
         productRepository.save(product);

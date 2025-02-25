@@ -130,6 +130,7 @@ public class AnonymousCartServiceImp implements AnonymousCartService{
         try {
             AnonymousUserSessionData anonymousUserSessionData = (AnonymousUserSessionData) sessionService.getSessionData(sessionId);
             anonymousUserSessionData.removeFromCartItems(removeFromCartDto.getProductId() , removeFromCartDto.getVendorProductId());
+            sessionService.addToSession(sessionId , anonymousUserSessionData);
         }catch (CustomRuntimeException e){
             log.error(e.getMessage());
             throw new CustomRuntimeException("Failed While Deleting From Cart");

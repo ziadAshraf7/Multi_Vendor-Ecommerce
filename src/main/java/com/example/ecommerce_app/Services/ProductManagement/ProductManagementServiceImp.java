@@ -8,7 +8,7 @@ import com.example.ecommerce_app.Exceptions.Exceptions.CustomConflictException;
 import com.example.ecommerce_app.Exceptions.Exceptions.CustomNotFoundException;
 import com.example.ecommerce_app.Exceptions.Exceptions.DatabasePersistenceException;
 import com.example.ecommerce_app.Projections.Category.CategoryIdsGeneralInfoView;
-import com.example.ecommerce_app.Projections.User.UserGeneralInfoInfoView;
+import com.example.ecommerce_app.Projections.User.UserGeneralInfoView;
 import com.example.ecommerce_app.Repositery.Attribute.AttributeRepository;
 import com.example.ecommerce_app.Repositery.Brand.BrandRepository;
 import com.example.ecommerce_app.Repositery.Category.CategoryRepository;
@@ -81,7 +81,7 @@ public class ProductManagementServiceImp implements ProductManagementService {
             if(subCategoryGeneralInfoEntity.getParentCategoryId() <= 0) throw new CustomBadRequestException("category is parent category");
             Category subCategoryReference = categoryRepository.getReferenceById(productCreationDto.getSubCategoryId());
 
-            UserGeneralInfoInfoView vendorGeneralInfoEntity = userRepository.findGeneralInfoById(productCreationDto.getVendorId());
+            UserGeneralInfoView vendorGeneralInfoEntity = userRepository.findGeneralInfoById(productCreationDto.getVendorId());
 
             if(vendorGeneralInfoEntity == null ) throw new CustomNotFoundException("user vendor is not found");
 

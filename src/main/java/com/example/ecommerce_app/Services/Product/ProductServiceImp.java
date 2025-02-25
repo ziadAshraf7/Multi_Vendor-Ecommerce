@@ -201,7 +201,7 @@ public class ProductServiceImp implements ProductService
      public void removeProduct(long productId) {
         try {
             Product product = getProductEntityById(productId);
-            fileSystemStorageService.deleteImageFile(product.getThumbNail());
+//            fileSystemStorageService.deleteImageFile(product.getThumbNail());
             productRepository.deleteById(product.getId());
         }catch (DatabaseInternalServerError e){
             log.error(e.getMessage());

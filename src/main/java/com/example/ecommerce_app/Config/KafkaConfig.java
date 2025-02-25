@@ -1,7 +1,7 @@
 package com.example.ecommerce_app.Config;
 
 
-import com.example.ecommerce_app.Notification.DataModel.NotificationData;
+import com.example.ecommerce_app.Services.NotificationService.DataModel.NotificationData;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

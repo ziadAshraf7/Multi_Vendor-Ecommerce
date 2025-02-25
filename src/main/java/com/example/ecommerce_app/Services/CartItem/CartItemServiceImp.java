@@ -117,7 +117,7 @@ public class CartItemServiceImp implements CartItemService{
                 vendorProduct.getId()
         );
 
-        if(excistingCartItem != null) throw new CustomNotFoundException("cart item is already exists");
+        if(excistingCartItem != null) throw new CustomBadRequestException("cart item is already exists");
 
         CartItem cartItem = CartItem.builder()
                 .id(new CartItemEmbeddedId(
@@ -153,11 +153,9 @@ public class CartItemServiceImp implements CartItemService{
 
     @Override
     @Transactional
-    public void removeAllFromCart(long cartId) {
-            Cart cart = cartRepository.findById(cartId).orElseThrow(
-                    () -> new CustomNotFoundException("cart is not found")
-            );
-
+    public void removeAllFromCart(long userId) {
+            Cart cart = cartRepository.findByCustomerId(userId);
+            if(cart == null) throw new CustomNotFoundException("cart is not found");
             cartItemRepository.deleteAllBYCartId(cart.getId());
 
     }

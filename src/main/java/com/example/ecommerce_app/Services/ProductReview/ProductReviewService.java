@@ -15,7 +15,7 @@ public interface ProductReviewService {
 
     void addReview(ProductReviewCreationDto productReview_creation_dto);
 
-    void removeReview(long userId , long productId);
+    void removeReview(long productId);
 
     ProductReview_Detailed_Dto updateReview(ProductReview_Update_Dto productReview_update_dto) throws IOException;
 

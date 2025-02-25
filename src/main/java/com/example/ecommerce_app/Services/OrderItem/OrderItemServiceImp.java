@@ -39,7 +39,7 @@ public class OrderItemServiceImp implements OrderItemService{
     @Override
     public List<OrderItemResponseDto> getOrderItems(long orderId) {
 
-        List<OrderItem> orderItems = orderItemRepository.findAllById(Collections.singleton(orderId));
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId((orderId));
 
         List<OrderItemResponseDto> orderItemResponseDtos = new ArrayList<>(orderItems.size());
 
@@ -83,7 +83,7 @@ public class OrderItemServiceImp implements OrderItemService{
                         .quantity(orderItem.getQuantity())
                         .productThumbnail(orderItem.getProduct().getThumbNail())
                         .build());
-        return new PageImpl<>(orderItemResponseDtos);
+        return new PageImpl<>(orderItemResponseDtos , pageable ,    orderItemList.getTotalElements());
     }
 
 
