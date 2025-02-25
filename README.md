@@ -8,6 +8,8 @@ This project is a multi-vendor eCommerce platform built using modern **Java** te
 
 ### Database Schema & API
 The project includes a robust and scalable database schema that supports key eCommerce functionalities. The following tables have been implemented, with their respective services and REST APIs:
+![Example Image](uploads/db%20schema.png)
+
 - **Product**
 - **User**
 - **Brand**
